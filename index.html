@@ -99,6 +99,7 @@ textarea{resize:none;}
       <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openLeave()">📋 MC / EL / Cuti</button>
       <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openAdmin()">⚙ Pentadbir</button>
     </div>
+    <button class="btn btn-ghost" style="font-size:13px;padding:12px;" onclick="openRehat()">🚪 &nbsp;Keluar Rehat / Masuk Semula</button>
     <div style="height:6px;"></div>
   </div>
 </div>
@@ -215,6 +216,70 @@ textarea{resize:none;}
   </div>
 </div>
 
+<!-- ══ REHAT ══════════════════════════════════════════ -->
+<div id="p-rehat" class="page">
+  <div class="top">
+    <button class="top-back" onclick="goSel()">‹</button>
+    <div style="flex:1;"><div class="top-title">Rehat / Masuk Semula</div><div class="top-sub">Had rehat: 4 jam · Melebihi = Cuti Rehat</div></div>
+    <button onclick="goSel()" style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;">🔒 Keluar</button>
+  </div>
+  <div class="scroll">
+    <!-- Status rehat anggota hari ini -->
+    <div class="card cp">
+      <div class="lbl">Status Rehat Hari Ini</div>
+      <div id="rehat-status-list"></div>
+    </div>
+
+    <div class="card cp">
+      <div class="lbl">Pilih Anggota</div>
+      <select id="rh-mem"></select>
+    </div>
+
+    <div class="card cp">
+      <div class="lbl">Tindakan</div>
+      <div class="g2">
+        <button class="btn btn-amber" id="rh-keluar-btn" onclick="setRhAction('keluar')" style="flex-direction:column;gap:4px;padding:12px;font-size:12px;">
+          <span style="font-size:22px;">🚪</span>Keluar Rehat
+        </button>
+        <button class="btn btn-ghost" id="rh-masuk-btn" onclick="setRhAction('masuk')" style="flex-direction:column;gap:4px;padding:12px;font-size:12px;">
+          <span style="font-size:22px;">✅</span>Masuk Semula
+        </button>
+      </div>
+    </div>
+
+    <div id="rh-info" style="display:none;"></div>
+
+    <div id="rh-action-area"></div>
+    <div style="height:8px;"></div>
+  </div>
+</div>
+
+<!-- ══ REHAT PREVIEW ══════════════════════════════════════════ -->
+<div id="p-rehat-prev" class="page">
+  <div class="top">
+    <button class="top-back" onclick="show('p-rehat')">‹</button>
+    <div><div class="top-title">Masuk Semula — Semak</div><div class="top-sub" id="rhprev-lbl"></div></div>
+  </div>
+  <div class="scroll">
+    <div style="position:relative;border-radius:12px;overflow:hidden;border:1px solid #334155;">
+      <img id="rh-pimg" style="width:100%;display:block;" alt="">
+      <div style="background:rgba(0,0,0,0.85);padding:10px 12px;font-family:monospace;font-size:10px;line-height:1.9;">
+        <div style="color:#00ff88;" id="rh-ov1"></div>
+        <div style="color:#60a5fa;" id="rh-ov2"></div>
+        <div style="color:#67e8f9;" id="rh-ov3"></div>
+        <div style="color:#fbbf24;" id="rh-ov4">📍 Mendapatkan lokasi...</div>
+      </div>
+    </div>
+    <div id="rh-locdiv"></div>
+    <div id="rh-duration-info" style="display:none;"></div>
+    <div class="gap">
+      <button class="btn btn-green" id="rh-bsub" disabled onclick="submitMasukSemula()">✓ &nbsp;Sahkan Masuk Semula</button>
+      <button class="btn btn-ghost" onclick="rhRetake()">↺ &nbsp;Ulang Gambar</button>
+    </div>
+    <div style="height:8px;"></div>
+  </div>
+</div>
+
 <!-- ══ PIN ══════════════════════════════════════════ -->
 <div id="p-pin" class="page">
   <div class="top"><button class="top-back" onclick="goSel()">‹</button><div><div class="top-title">Log Masuk Penyelia</div><div class="top-sub">Masukkan PIN</div></div></div>
@@ -246,7 +311,7 @@ textarea{resize:none;}
       <div class="lbl">Tapis</div>
       <div class="gap" style="gap:7px;">
         <select id="afsh" onchange="renderAdmin()"><option value="">Semua Shift</option><option>Alpha</option><option>Bravo</option><option>Charlie</option><option>Delta</option></select>
-        <select id="afjb" onchange="renderAdmin()"><option value="">Semua Jabatan</option><option>IKTAR</option><option>MHKL</option><option>RT</option></select>
+        <select id="afjb" onchange="renderAdmin()"><option value="">Semua Jabatan</option><option>IKTAR</option><option>MHKL</option><option>RT</option><option>Wisma Rekod</option></select>
         <select id="afm"  onchange="renderAdmin()"></select>
         <select id="afd"  onchange="renderAdmin()"></select>
       </div>
@@ -276,7 +341,7 @@ const SUPABASE_KEY = "sb_publishable_MA-BFIOAYKsBBUhfvub7gQ_A647ggGW";
 
 const PIN    = "6438670";
 const HKL    = {lat:3.1718,lng:101.6989};
-const RADIUS = 300;
+const RADIUS = 1200; // Meliputi seluruh kawasan HKL + Wisma Polis Bantuan
 const GRACE  = 3600000;
 const SLOTS  = {PG:[7,8,9,10,11,12,13,14],PT:[15,16,17,18,19,20,21,22],M:[23,0,1,2,3,4,5,6]};
 const SCHED  = {
@@ -299,6 +364,7 @@ const MEMBERS=[
   {id:"M40",n:"RIMA BINTI OTHMAN",j:"IKTAR",s:"Delta"},{id:"M41",n:"MOHAMMAD FITHRI BIN AB LATIF",j:"IKTAR",s:"Delta"},{id:"M42",n:"MOHAMAD ALIFF HAIQAL BIN JAMIL",j:"IKTAR",s:"Delta"},{id:"M43",n:"LATIFA ROBANIA BINTI ABDUL RAZAK",j:"IKTAR",s:"Delta"},{id:"M44",n:"AHMAD SHAMIL BIN NADZRI",j:"IKTAR",s:"Delta"},{id:"M45",n:"ROHISHAM BIN MOHAMAD AROF",j:"IKTAR",s:"Delta"},
   {id:"M46",n:"MOHD LUKMAN BIN HAMDAN",j:"MHKL",s:"Delta"},{id:"M47",n:"SUHAIRI BIN ISMAIL",j:"MHKL",s:"Delta"},{id:"M48",n:"NURSYUHADA BINTI MISNAN",j:"MHKL",s:"Delta"},
   {id:"M49",n:"ROSARIZAM BIN SAMSUDIN",j:"RT",s:"Delta"},{id:"M50",n:"MUHAMMAD TARMIZI BIN SAZALI",j:"RT",s:"Delta"},{id:"M51",n:"KHAIROL ISZUWAN BIN ZAKARIA",j:"RT",s:"Delta"},{id:"M52",n:"MOHD NAZRI BIN ISMAIL",j:"RT",s:"Delta"},
+  {id:"M53",n:"MOHD RIDZUAN BIN BUKHRI",j:"Wisma Rekod",s:"Delta"},
 ];
 
 // ═══ SUPABASE API ══════════════════════════════════════
@@ -320,12 +386,14 @@ async function loadToday(){
   if(cache.date===today) return;
   showLoad("Memuatkan data...");
   try{
-    const [r,l]=await Promise.all([
+    const [r,l,rh]=await Promise.all([
       sbGet("checkins","?date=eq."+today+"&order=ts.asc"),
-      sbGet("leaves","?date=eq."+today)
+      sbGet("leaves","?date=eq."+today),
+      sbGet("rehat","?date=eq."+today+"&order=ts.asc")
     ]);
     cache.recs=Array.isArray(r)?r:[];
     cache.lvs=Array.isArray(l)?l:[];
+    rehatCache=Array.isArray(rh)?rh:[];
     cache.date=today;
   }catch(e){toast("⚠ Tiada sambungan internet.");}
   hideLoad();
@@ -403,12 +471,12 @@ function renderList(){
   if(q)vis=vis.filter(m=>m.n.toLowerCase().includes(q)||m.j.toLowerCase().includes(q));
   const el=document.getElementById("mlist");el.innerHTML="";
   if(!vis.length){el.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;font-size:12px;">Tiada anggota.</div>';return;}
-  const jc={IKTAR:"#60a5fa",MHKL:"#34d399",RT:"#fbbf24"},ac={Alpha:"av-a",Bravo:"av-b",Charlie:"av-c",Delta:"av-d"};
+  const jc={IKTAR:"#60a5fa",MHKL:"#34d399",RT:"#fbbf24","Wisma Rekod":"#f472b6"},ac={Alpha:"av-a",Bravo:"av-b",Charlie:"av-c",Delta:"av-d"};
   const groups={};vis.forEach(m=>{const k=m.s+"|"+m.j;if(!groups[k])groups[k]={s:m.s,j:m.j,ms:[]};groups[k].ms.push(m);});
   Object.values(groups).forEach(g=>{
     const st=getShift(g.s,d);
     const hdr=document.createElement("div");hdr.className="grp";hdr.style.color=jc[g.j]||"#e2e8f0";
-    const jabFull={IKTAR:"Jabatan IKTAR",MHKL:"Jabatan MHKL",RT:"Jabatan RT"};
+    const jabFull={IKTAR:"Jabatan IKTAR",MHKL:"Jabatan MHKL",RT:"Jabatan RT","Wisma Rekod":"Wisma Rekod"};
     hdr.innerHTML="Shift "+g.s+" · "+(jabFull[g.j]||g.j)+` <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:${jc[g.j]}22;">${st}</span>`;
     el.appendChild(hdr);
     g.ms.forEach(m=>{
@@ -520,6 +588,25 @@ function snapPhoto(){
     toast("⚠ Gambar diambil tanpa watermark. Host di HTTPS untuk watermark penuh.");
   }
   stopCam();
+
+  // ── REHAT MODE: masuk semula ──
+  if(window._rehatMode && rhMember){
+    rhPhoto=photo; rhPhotoTs=photoTs;
+    document.getElementById("rh-pimg").src=photo||"";
+    document.getElementById("rhprev-lbl").textContent="Masuk Semula · "+rhMember.n;
+    document.getElementById("rh-ov1").textContent="⏱ "+fmtDT(photoTs);
+    document.getElementById("rh-ov2").textContent="👤 "+rhMember.n+" · "+rhMember.j;
+    const st2=getMemberRehatStatus(rhMember.id);
+    const durMs2=st2.keluar?photoTs-st2.keluar.ts:0;
+    document.getElementById("rh-ov3").textContent="☕ Masuk Semula · Tempoh Rehat: "+fmtDur(durMs2)+(durMs2>MAX_REHAT_MS?" ⚠ MELEBIHI 4JAM":"");
+    document.getElementById("rh-ov4").textContent="📍 Mendapatkan lokasi...";
+    document.getElementById("rh-ov4").style.color="#60a5fa";
+    document.getElementById("rh-bsub").disabled=true;
+    show("p-rehat-prev");
+    getRhLoc();
+    return;
+  }
+
   if(photo)document.getElementById("pimg").src=photo;
   document.getElementById("plbl").textContent="Slot "+(curSlot+1)+"/8 · "+z(SLOTS[curST][curSlot])+":00";
   document.getElementById("ov1").textContent="⏱ "+fmtDT(photoTs);
@@ -533,6 +620,17 @@ function snapPhoto(){
 function retake(){photo=null;photoTs=null;userLoc=null;openCam();}
 
 // ═══ LOCATION ═════════════════════════════════════════
+async function reverseGeocode(lat,lng){
+  try{
+    const res=await fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json&accept-language=ms",{headers:{"User-Agent":"HKL-Kehadiran/1.0"}});
+    const d=await res.json();
+    // Extract meaningful location name
+    const r=d.address||{};
+    // Priority: building > amenity > road > suburb
+    return r.building||r.amenity||r.office||r.healthcare||r.road||r.suburb||r.neighbourhood||d.display_name?.split(",")[0]||"Kawasan HKL";
+  }catch(e){return null;}
+}
+
 function getLoc(){
   const el=document.getElementById("locdiv");
   el.innerHTML=locH("loc-wait","⏳","Mendapatkan lokasi...","Sila benarkan akses lokasi","#60a5fa");
@@ -542,14 +640,27 @@ function getLoc(){
     document.getElementById("ov4").textContent="📍 GPS tidak disokong";
     document.getElementById("bsub").disabled=false;return;
   }
-  navigator.geolocation.getCurrentPosition(pos=>{
+  navigator.geolocation.getCurrentPosition(async pos=>{
     const{latitude:lat,longitude:lng,accuracy:acc}=pos.coords;
     const dist=Math.round(hav(lat,lng,HKL.lat,HKL.lng)),valid=dist<=RADIUS;
     userLoc={lat,lng,dist,valid,acc:Math.round(acc)};
-    el.innerHTML=valid?locH("loc-ok","📍","Lokasi Sah ✓",dist+"m dari HKL · ±"+Math.round(acc)+"m","#34d399"):locH("loc-bad","⚠️","Lokasi TIDAK SAH",dist+"m — melebihi "+RADIUS+"m","#f87171");
+
+    // Get location name from Nominatim
+    const locName=await reverseGeocode(lat,lng);
+    userLoc.locName=locName;
+
+    const locLabel=locName?locName+" ("+dist+"m dari HKL)":dist+"m dari HKL";
     const ov4=document.getElementById("ov4");
-    ov4.textContent=valid?"📍 Hospital Kuala Lumpur ("+dist+"m) ✓ SAH":"📍 "+dist+"m dari HKL — TIDAK SAH";
-    ov4.style.color=valid?"#34d399":"#f87171";
+
+    if(valid){
+      el.innerHTML=locH("loc-ok","📍","Lokasi Sah ✓ · "+( locName||"Kawasan HKL"),dist+"m dari HKL · ±"+Math.round(acc)+"m","#34d399");
+      ov4.textContent="📍 "+( locName||"Hospital Kuala Lumpur")+" ("+dist+"m) ✓ SAH";
+      ov4.style.color="#34d399";
+    }else{
+      el.innerHTML=locH("loc-bad","⚠️","Lokasi TIDAK SAH · "+(locName||dist+"m dari HKL"),dist+"m — di luar kawasan HKL","#f87171");
+      ov4.textContent="📍 "+(locName||dist+"m dari HKL")+" — TIDAK SAH";
+      ov4.style.color="#f87171";
+    }
     document.getElementById("bsub").disabled=false;
   },()=>{
     el.innerHTML=locH("loc-unk","❓","Lokasi Gagal","Akses ditolak","#fbbf24");
@@ -561,13 +672,57 @@ function getLoc(){
 function locH(cls,ic,lb,dt,c){return`<div class="loc ${cls}"><div style="font-size:20px;flex-shrink:0;">${ic}</div><div><div style="font-size:12px;font-weight:600;color:${c};">${lb}</div><div style="font-size:10px;color:${c};opacity:.75;margin-top:2px;font-family:monospace;">${dt}</div></div></div>`;}
 function hav(a,b,c,d){const R=6371000,da=(c-a)*Math.PI/180,db=(d-b)*Math.PI/180;const x=Math.sin(da/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(db/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 
+// Location for rehat masuk semula
+async function getRhLoc(){
+  const el=document.getElementById("rh-locdiv"),btn=document.getElementById("rh-bsub");
+  el.innerHTML=locH("loc-wait","⏳","Mendapatkan lokasi...","Sila benarkan akses lokasi","#60a5fa");
+  btn.disabled=true;
+  if(!navigator.geolocation){
+    el.innerHTML=locH("loc-unk","❓","GPS Tidak Disokong","","#fbbf24");
+    document.getElementById("rh-ov4").textContent="📍 GPS tidak disokong";
+    btn.disabled=false;return;
+  }
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const{latitude:lat,longitude:lng,accuracy:acc}=pos.coords;
+    const dist=Math.round(hav(lat,lng,HKL.lat,HKL.lng)),valid=dist<=RADIUS;
+    const locName=await reverseGeocode(lat,lng);
+    rhLoc={lat,lng,dist,valid,acc:Math.round(acc),locName};
+    const ov4=document.getElementById("rh-ov4");
+    if(valid){
+      el.innerHTML=locH("loc-ok","📍","Lokasi Sah ✓ · "+(locName||"Kawasan HKL"),dist+"m dari HKL · ±"+Math.round(acc)+"m","#34d399");
+      ov4.textContent="📍 "+(locName||"Hospital Kuala Lumpur")+" ("+dist+"m) ✓ SAH";
+      ov4.style.color="#34d399";
+    }else{
+      el.innerHTML=locH("loc-bad","⚠️","Lokasi TIDAK SAH · "+(locName||dist+"m"),dist+"m — di luar kawasan HKL","#f87171");
+      ov4.textContent="📍 "+(locName||dist+"m dari HKL")+" — TIDAK SAH";
+      ov4.style.color="#f87171";
+    }
+    // Show duration info
+    const st2=getMemberRehatStatus(rhMember?.id||"");
+    const durMs2=st2.keluar?Date.now()-st2.keluar.ts:0;
+    const over=durMs2>MAX_REHAT_MS;
+    const di=document.getElementById("rh-duration-info");
+    di.style.display="block";
+    di.innerHTML=`<div style="background:${over?"rgba(220,38,38,.1)":"rgba(5,150,105,.1)"};border:1px solid ${over?"rgba(220,38,38,.25)":"rgba(5,150,105,.25)"};border-radius:8px;padding:11px 13px;display:flex;gap:10px;">
+      <span>${over?"⚠️":"☕"}</span><div>
+      <div style="font-size:12px;font-weight:700;color:${over?"#f87171":"#34d399"};">Tempoh Rehat: ${fmtDur(durMs2)} ${over?"— MELEBIHI 4 JAM!":""}</div>
+      <div style="font-size:10px;color:${over?"#f87171":"#34d399"};opacity:.8;">${over?"Wajib isi Cuti Rehat selepas ini":"Dalam had yang dibenarkan"}</div>
+      </div></div>`;
+    btn.disabled=false;
+  },()=>{
+    el.innerHTML=locH("loc-unk","❓","Lokasi Gagal","Akses ditolak","#fbbf24");
+    document.getElementById("rh-ov4").textContent="📍 Lokasi gagal";
+    btn.disabled=false;
+  },{timeout:10000,enableHighAccuracy:true,maximumAge:0});
+}
+
 // ═══ SUBMIT ═══════════════════════════════════════════
 async function submitCI(){
   const today=todayStr();
   if(cache.recs.find(r=>r.mid===curM.id&&r.date===today&&r.slot===curSlot)){toast("Slot ini sudah direkod.");goSel();return;}
   const ts=slotTs(curST)[curSlot]||Date.now(),msLate=Date.now()-ts,isLate=msLate>60000;
   const valid=userLoc?.valid||false,dist=userLoc?.dist??null;
-  const rec={id:Date.now().toString(),mid:curM.id,name:curM.n,jab:curM.j,shift:curM.s,st:curST,date:today,slot:curSlot,slot_h:SLOTS[curST][curSlot],ts:photoTs,photo:photo||null,lat:userLoc?.lat??null,lng:userLoc?.lng??null,dist,valid,late:isLate,mins_late:isLate?Math.floor(msLate/60000):0};
+  const rec={id:Date.now().toString(),mid:curM.id,name:curM.n,jab:curM.j,shift:curM.s,st:curST,date:today,slot:curSlot,slot_h:SLOTS[curST][curSlot],ts:photoTs,photo:photo||null,lat:userLoc?.lat??null,lng:userLoc?.lng??null,dist,valid,late:isLate,mins_late:isLate?Math.floor(msLate/60000):0,loc_name:userLoc?.locName??null};
   showLoad("Menyimpan rekod...");
   const ok=await sbInsert("checkins",rec);
   hideLoad();
@@ -663,12 +818,217 @@ async function renderAdmin(){
     const div=document.createElement("div");div.style.cssText="display:flex;align-items:center;gap:10px;padding:11px 13px;"+(i<all.length-1?"border-bottom:1px solid #334155;":"");
     if(r._t==="ci"){
       const chip=r.valid?(r.late?`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(180,83,9,.2);color:#fbbf24;">⚠ LEWAT ${r.mins_late}min</span>`:`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(5,150,105,.2);color:#34d399;">✓ SAH</span>`):`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(220,38,38,.2);color:#f87171;">✗ TIDAK SAH</span>`;
-      div.innerHTML=(r.photo?`<img src="${r.photo}" style="width:46px;height:46px;border-radius:7px;object-fit:cover;flex-shrink:0;border:1px solid #334155;">`:`<div style="width:46px;height:46px;border-radius:7px;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📷</div>`)+`<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</div><div style="font-size:9px;color:#64748b;font-family:monospace;">${r.shift} · ${r.jab} · Slot ${r.slot+1} · ${z(r.slot_h)}:00 · ${fmtT(r.ts)}${r.dist!==null?" · "+r.dist+"m":""}</div>${chip}</div>`;
+      div.innerHTML=(r.photo?`<img src="${r.photo}" style="width:46px;height:46px;border-radius:7px;object-fit:cover;flex-shrink:0;border:1px solid #334155;">`:`<div style="width:46px;height:46px;border-radius:7px;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📷</div>`)+`<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</div><div style="font-size:9px;color:#64748b;font-family:monospace;">${r.shift} · ${r.jab} · Slot ${r.slot+1} · ${z(r.slot_h)}:00 · ${fmtT(r.ts)}</div><div style="font-size:9px;color:#475569;margin-top:1px;">📍 ${r.loc_name||( r.dist!==null?r.dist+"m dari HKL":"—")}</div>${chip}</div>`;
     }else{
       div.innerHTML=`<div style="width:46px;height:46px;border-radius:7px;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${r.type==="MC"?"🏥":r.type==="EL"?"🆘":"📅"}</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</div><div style="font-size:9px;color:#64748b;font-family:monospace;">${r.shift} · ${r.jab} · ${fmtT(r.ts)}</div><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(124,58,237,.2);color:#c4b5fd;">${r.type}</span>${r.nota?`<div style="font-size:9px;color:#64748b;margin-top:3px;">${r.nota}</div>`:""}</div>`;
     }
     con.appendChild(div);
   });
+}
+
+// ═══ REHAT ════════════════════════════════════════════
+let rhAction="keluar", rhMember=null, rhPhoto=null, rhPhotoTs=null, rhLoc=null;
+const MAX_REHAT_MS = 4 * 60 * 60 * 1000; // 4 jam
+
+// Cache rehat records
+let rehatCache = [];
+async function loadRehatToday(){
+  try{
+    const r = await sbGet("rehat","?date=eq."+todayStr()+"&order=ts.asc");
+    rehatCache = Array.isArray(r)?r:[];
+  }catch(e){ rehatCache=[]; }
+}
+
+function getMemberRehatStatus(mid){
+  const recs = rehatCache.filter(r=>r.mid===mid).sort((a,b)=>a.ts-b.ts);
+  if(!recs.length) return {status:"tiada", keluar:null, masuk:null, duration:0};
+  const last = recs[recs.length-1];
+  if(last.action==="keluar"){
+    const dur = Date.now()-last.ts;
+    return {status:"diluar", keluar:last, masuk:null, duration:dur, over: dur>MAX_REHAT_MS};
+  }
+  // Find matching pair
+  let pairs=[], i=0;
+  while(i<recs.length){
+    if(recs[i].action==="keluar"){
+      const masuk=recs.find((r,idx)=>idx>i&&r.action==="masuk");
+      if(masuk) pairs.push({keluar:recs[i], masuk, dur:masuk.ts-recs[i].ts});
+    }
+    i++;
+  }
+  const totalDur=pairs.reduce((s,p)=>s+p.dur,0);
+  return {status:"dalam", keluar:null, masuk:last, duration:totalDur, pairs, over: totalDur>MAX_REHAT_MS};
+}
+
+function fmtDur(ms){
+  const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);
+  return (h>0?h+"j ":"")+m+"min";
+}
+
+async function openRehat(){
+  if(!adminOk){ pinTarget="rehat"; pinBuf=""; updDots(); show("p-pin"); return; }
+  await _openRehat();
+}
+async function _openRehat(){
+  await loadRehatToday();
+  const sel=document.getElementById("rh-mem");
+  sel.innerHTML='<option value="">— Pilih nama —</option>';
+  MEMBERS.forEach(m=>{
+    const o=document.createElement("option");
+    o.value=m.id;
+    const st=getMemberRehatStatus(m.id);
+    const tag=st.status==="diluar"?" 🚪 DILUAR":(st.status==="dalam"&&st.over)?" ⚠ MELEBIHI":"";
+    o.textContent=m.n+" ("+m.s+" · "+m.j+")"+tag;
+    sel.appendChild(o);
+  });
+  rhAction="keluar"; rhMember=null; rhPhoto=null; rhPhotoTs=null; rhLoc=null;
+  setRhAction("keluar");
+  renderRehatStatusList();
+  show("p-rehat");
+}
+
+function renderRehatStatusList(){
+  const el=document.getElementById("rehat-status-list");
+  const diluar=rehatCache.filter(r=>r.action==="keluar"&&!rehatCache.find(x=>x.mid===r.mid&&x.action==="masuk"&&x.ts>r.ts));
+  if(!diluar.length){
+    el.innerHTML='<div style="font-size:12px;color:#64748b;text-align:center;padding:8px;">Tiada anggota yang sedang berehat sekarang.</div>';
+    return;
+  }
+  el.innerHTML=diluar.map(r=>{
+    const dur=Date.now()-r.ts;
+    const over=dur>MAX_REHAT_MS;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e293b;">
+      <span style="font-size:18px;">${over?"⚠️":"🚪"}</span>
+      <div style="flex:1;">
+        <div style="font-size:11px;font-weight:700;">${r.name}</div>
+        <div style="font-size:10px;color:#64748b;">Keluar: ${fmtT(r.ts)} · Sudah: ${fmtDur(dur)}</div>
+      </div>
+      <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:${over?"rgba(220,38,38,.2)":"rgba(245,158,11,.2)"};color:${over?"#f87171":"#fbbf24"};">${over?"LEBIH 4JAM":"REHAT"}</span>
+    </div>`;
+  }).join("");
+}
+
+function setRhAction(a){
+  rhAction=a;
+  document.getElementById("rh-keluar-btn").style.background=a==="keluar"?"#b45309":"#1e293b";
+  document.getElementById("rh-masuk-btn").style.background=a==="masuk"?"#059669":"#1e293b";
+
+  const mid=document.getElementById("rh-mem").value;
+  const info=document.getElementById("rh-info");
+  const area=document.getElementById("rh-action-area");
+
+  if(mid){
+    const m=MEMBERS.find(x=>x.id===mid);
+    const st=getMemberRehatStatus(mid);
+    if(a==="keluar"){
+      if(st.status==="diluar"){
+        info.style.display="block";
+        info.innerHTML=`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:11px 13px;display:flex;gap:10px;">
+          <span>⚠️</span><div><div style="font-size:12px;font-weight:700;color:#fbbf24;">${m?m.n:""} sedang diluar</div>
+          <div style="font-size:10px;color:#fbbf24;opacity:.8;">Keluar sejak ${fmtT(st.keluar.ts)} · Sudah ${fmtDur(st.duration)}</div></div></div>`;
+        area.innerHTML=`<button class="btn btn-ghost" disabled style="opacity:.4;font-size:13px;">Anggota sudah diluar — pilih Masuk Semula</button>`;
+        return;
+      }
+      info.style.display="none";
+      area.innerHTML=`<button class="btn btn-amber" onclick="submitKeluarRehat()" style="font-size:14px;">🚪 &nbsp;Rekod Keluar Rehat</button>`;
+    } else {
+      if(st.status!=="diluar"){
+        info.style.display="block";
+        info.innerHTML=`<div style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:8px;padding:11px 13px;display:flex;gap:10px;">
+          <span>ℹ️</span><div><div style="font-size:12px;font-weight:700;color:#93c5fd;">${m?m.n:""} belum rekod keluar</div>
+          <div style="font-size:10px;color:#93c5fd;opacity:.8;">Tiada rekod keluar rehat hari ini.</div></div></div>`;
+        area.innerHTML=`<button class="btn btn-ghost" disabled style="opacity:.4;font-size:13px;">Tiada rekod keluar — pilih Keluar Rehat dulu</button>`;
+        return;
+      }
+      info.style.display="block";
+      const dur=st.duration, over=dur>MAX_REHAT_MS;
+      info.innerHTML=`<div style="background:${over?"rgba(220,38,38,.1)":"rgba(5,150,105,.1)"};border:1px solid ${over?"rgba(220,38,38,.25)":"rgba(5,150,105,.25)"};border-radius:8px;padding:11px 13px;display:flex;gap:10px;">
+        <span>${over?"⚠️":"☕"}</span><div>
+        <div style="font-size:12px;font-weight:700;color:${over?"#f87171":"#34d399"};">Masa Rehat: ${fmtDur(dur)} ${over?"— MELEBIHI 4 JAM!":""}</div>
+        <div style="font-size:10px;color:${over?"#f87171":"#34d399"};opacity:.8;">Keluar: ${fmtT(st.keluar.ts)}${over?" · Wajib isi Cuti Rehat":""}</div></div></div>`;
+      area.innerHTML=`<button class="btn btn-green" onclick="startRehatCam()" style="font-size:14px;">📸 &nbsp;Ambil Selfie Masuk Semula</button>`;
+    }
+  } else {
+    info.style.display="none";
+    area.innerHTML="";
+  }
+}
+
+// Update info when member changes
+document.addEventListener("change",function(e){if(e.target.id==="rh-mem"){ setRhAction(rhAction); }});
+
+async function submitKeluarRehat(){
+  const mid=document.getElementById("rh-mem").value;
+  if(!mid){toast("Sila pilih nama.");return;}
+  const m=MEMBERS.find(x=>x.id===mid);
+  const rec={id:Date.now().toString(),mid,name:m.n,jab:m.j,shift:m.s,date:todayStr(),action:"keluar",ts:Date.now(),photo:null,lat:null,lng:null,dist:null,valid:null,loc_name:null,duration_mins:null,over_limit:false};
+  showLoad("Merekod keluar rehat...");
+  const ok=await sbInsert("rehat",rec);
+  hideLoad();
+  if(!ok){toast("❌ Gagal simpan. Semak sambungan.");return;}
+  rehatCache.push(rec);
+  toast("🚪 Keluar rehat "+m.n+" direkod — "+fmtT(Date.now()));
+  renderRehatStatusList();
+  setRhAction("keluar");
+  renderList();
+}
+
+function startRehatCam(){
+  const mid=document.getElementById("rh-mem").value;
+  if(!mid){toast("Sila pilih nama.");return;}
+  rhMember=MEMBERS.find(x=>x.id===mid);
+  rhPhoto=null; rhPhotoTs=null; rhLoc=null;
+  // Use main camera - reuse curM temp
+  curM=rhMember; curSlot=0; curST=stNow();
+  // Override snap to go to rehat preview
+  window._rehatMode=true;
+  show("p-cam"); startCam();
+}
+
+function rhRetake(){
+  window._rehatMode=true;
+  show("p-cam"); startCam();
+}
+
+async function submitMasukSemula(){
+  const mid=rhMember.id;
+  const st=getMemberRehatStatus(mid);
+  if(st.status!=="diluar"){toast("Tiada rekod keluar.");return;}
+  const keluarTs=st.keluar.ts;
+  const durMs=Date.now()-keluarTs;
+  const durMin=Math.floor(durMs/60000);
+  const over=durMs>MAX_REHAT_MS;
+
+  const rec={id:Date.now().toString(),mid,name:rhMember.n,jab:rhMember.j,shift:rhMember.s,date:todayStr(),action:"masuk",ts:rhPhotoTs||Date.now(),photo:rhPhoto,lat:rhLoc?.lat??null,lng:rhLoc?.lng??null,dist:rhLoc?.dist??null,valid:rhLoc?.valid??false,loc_name:rhLoc?.locName??null,duration_mins:durMin,over_limit:over};
+  showLoad("Merekod masuk semula...");
+  const ok=await sbInsert("rehat",rec);
+  hideLoad();
+  if(!ok){toast("❌ Gagal simpan.");return;}
+  rehatCache.push(rec);
+  window._rehatMode=false;
+  renderList();
+
+  if(over){
+    toast("⚠ Masuk semula direkod. Masa rehat melebihi 4 jam — wajib isi Cuti Rehat!");
+    // Auto-open leave form
+    setTimeout(()=>{
+      _openLeave();
+      // Pre-select member
+      const sel=document.getElementById("lvm");
+      for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===mid){sel.selectedIndex=i;break;}}
+      setLT("Cuti");
+      document.getElementById("lvnota").value="Cuti Rehat — Melebihi 4 jam ("+fmtDur(durMs)+")";
+      // Show warning
+      const warn=document.createElement("div");
+      warn.style.cssText="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:11px 13px;display:flex;gap:10px;margin-bottom:10px;";
+      warn.innerHTML='<span>⚠️</span><div><div style="font-size:12px;font-weight:700;color:#f87171;">Masa Rehat Melebihi 4 Jam!</div><div style="font-size:10px;color:#f87171;opacity:.8;">Masa rehat: '+fmtDur(durMs)+' — Wajib isi dan hantar borang Cuti Rehat.</div></div>';
+      const scroll=document.querySelector("#p-leave .scroll");
+      if(scroll) scroll.prepend(warn);
+    },500);
+  } else {
+    toast("✅ Masuk semula "+rhMember.n+" direkod — "+fmtDur(durMs));
+    goSel();
+  }
 }
 
 // ═══ INIT ═════════════════════════════════════════════
@@ -678,3 +1038,4 @@ setInterval(()=>{cache.date="";loadToday().then(()=>renderList());},300000); // 
 </script>
 </body>
 </html>
+
