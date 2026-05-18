@@ -444,7 +444,14 @@ function tick(){
   document.getElementById("clk").textContent=z(d.getHours())+":"+z(d.getMinutes())+":"+z(d.getSeconds());
   document.getElementById("dt").textContent=d.toLocaleDateString("ms-MY",{weekday:"short",day:"2-digit",month:"short",year:"numeric"});
   const sb=document.getElementById("shifts");sb.innerHTML="";
-  ["Alpha","Bravo","Charlie","Delta"].forEach(s=>{const st=getShift(s,d);const c=st==="PG"?"#0e7490":st==="PT"?"#b45309":st==="M"?"#7c3aed":"#4b5563";sb.innerHTML+=`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${c}33;color:${c};border:1px solid ${c}55;">${s}:${st}</span>`;});
+  const shiftNow=stNow();
+  ["Alpha","Bravo","Charlie","Delta"].forEach(s=>{
+    const st=getShift(s,d);
+    if(st==="OFF") return; // Jangan tunjuk shift OFF
+    const aktif=st===shiftNow;
+    const c=st==="PG"?"#0e7490":st==="PT"?"#b45309":st==="M"?"#7c3aed":"#4b5563";
+    sb.innerHTML+=`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${aktif?c:c+"33"};color:${aktif?"#fff":c};border:1px solid ${c}55;${aktif?"box-shadow:0 0 6px "+c+"66;":""}">${s}:${st}${aktif?" ◀":""}</span>`;
+  });
   const cst=stNow(),ts=slotTs(cst),now=Date.now(),nel=document.getElementById("nxt");
   for(let i=0;i<8;i++){
     if(now>=ts[i]&&now<ts[i]+GRACE){nel.textContent=z(SLOTS[cst][i])+":00 ("+Math.floor((ts[i]+GRACE-now)/60000)+"min)";nel.style.color="#34d399";return;}
@@ -469,12 +476,25 @@ function renderList(){
   let vis=MEMBERS;
   if(tabAct!=="all")vis=vis.filter(m=>m.s===tabAct);
   if(q)vis=vis.filter(m=>m.n.toLowerCase().includes(q)||m.j.toLowerCase().includes(q));
+
+  // Hanya tunjuk anggota yang bertugas shift SEKARANG sahaja
+  // Contoh: jam 15:00-22:59 = PT sahaja yang muncul
+  const shiftSekarang = stNow(); // PG / PT / M
+  if(!q) vis=vis.filter(m=>{
+    const st=getShift(m.s,d);
+    return st===shiftSekarang;
+  });
+
   const el=document.getElementById("mlist");el.innerHTML="";
-  if(!vis.length){el.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;font-size:12px;">Tiada anggota.</div>';return;}
+  if(!vis.length){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;font-size:12px;">Tiada anggota bertugas hari ini.</div>';
+    return;
+  }
   const jc={IKTAR:"#60a5fa",MHKL:"#34d399",RT:"#fbbf24","Wisma Rekod":"#f472b6"},ac={Alpha:"av-a",Bravo:"av-b",Charlie:"av-c",Delta:"av-d"};
   const groups={};vis.forEach(m=>{const k=m.s+"|"+m.j;if(!groups[k])groups[k]={s:m.s,j:m.j,ms:[]};groups[k].ms.push(m);});
   Object.values(groups).forEach(g=>{
     const st=getShift(g.s,d);
+    if(st==="OFF") return; // Skip kumpulan OFF
     const hdr=document.createElement("div");hdr.className="grp";hdr.style.color=jc[g.j]||"#e2e8f0";
     const jabFull={IKTAR:"Jabatan IKTAR",MHKL:"Jabatan MHKL",RT:"Jabatan RT","Wisma Rekod":"Wisma Rekod"};
     hdr.innerHTML="Shift "+g.s+" · "+(jabFull[g.j]||g.j)+` <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:${jc[g.j]}22;">${st}</span>`;
@@ -482,10 +502,10 @@ function renderList(){
     g.ms.forEach(m=>{
       const mr=getCacheRecs(m.id),lv=getCacheLv(m.id),done=mr.length;
       let bc="b-no",bt="Mulakan";
-      if(st==="OFF"){bc="b-off";bt="OFF";}else if(lv){bc="b-mc";bt=lv.type;}else if(done>=8){bc="b-ok";bt=done+"/8 ✓";}else if(done>0){bc="b-pt";bt=done+"/8";}
+      if(lv){bc="b-mc";bt=lv.type;}else if(done>=8){bc="b-ok";bt=done+"/8 ✓";}else if(done>0){bc="b-pt";bt=done+"/8";}
       const ini=m.n.trim().split(" ").filter(Boolean),av=(ini[0][0]+(ini[ini.length-1][0])).toUpperCase();
       const btn=document.createElement("button");btn.className="row";
-      const jf={IKTAR:"IKTAR",MHKL:"MHKL",RT:"RT"};
+      const jf={IKTAR:"IKTAR",MHKL:"MHKL",RT:"RT","Wisma Rekod":"Wisma Rekod"};
       btn.innerHTML=`<div class="av ${ac[m.s]}">${av}</div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.n}</div><div style="font-size:10px;color:#64748b;margin-top:2px;">${jf[m.j]||m.j} · Shift ${m.s}</div></div><span class="badge ${bc}">${bt}</span>`;
       btn.onclick=()=>startCI(m);el.appendChild(btn);
     });
