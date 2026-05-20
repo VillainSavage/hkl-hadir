@@ -344,13 +344,54 @@ const HKL    = {lat:3.1718,lng:101.6989};
 const RADIUS = 1200; // Meliputi seluruh kawasan HKL + Wisma Polis Bantuan
 const GRACE  = 3600000;
 const SLOTS  = {PG:[7,8,9,10,11,12,13,14],PT:[15,16,17,18,19,20,21,22],M:[23,0,1,2,3,4,5,6]};
-const SCHED  = {
-  Alpha:{Apr:["PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M",null],Mei:["OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M"],Jun:["M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG",null],Jul:["PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT"]},
-  Bravo:{Apr:["M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT",null],Mei:["PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT"],Jun:["PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF",null],Jul:["OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M"]},
-  Charlie:{Apr:["PG","PG","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT",null],Mei:["PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF"],Jun:["OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M",null],Jul:["M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG"]},
-  Delta:{Apr:["OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG",null],Mei:["M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG"],Jun:["PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT",null],Jul:["PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF"]}
+const SCHED={
+  Alpha:{
+    Apr:["PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M"],
+    Mei:["OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M"],
+    Jun:["M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG"],
+    Jul:["PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT"],
+    Ogos:["PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT"],
+    Sep:["PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF"],
+    Okt:["OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M"],
+    Nov:["OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG"],
+    Dis:["M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG"],
+  },
+  Bravo:{
+    Apr:["M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT"],
+    Mei:["PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT"],
+    Jun:["PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF"],
+    Jul:["OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M"],
+    Ogos:["OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M"],
+    Sep:["M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG"],
+    Okt:["PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT"],
+    Nov:["PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF"],
+    Dis:["PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF"],
+  },
+  Charlie:{
+    Apr:["PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF"],
+    Mei:["PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF"],
+    Jun:["OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M"],
+    Jul:["M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG"],
+    Ogos:["M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG"],
+    Sep:["PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT"],
+    Okt:["PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF"],
+    Nov:["PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M"],
+    Dis:["OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M"],
+  },
+  Delta:{
+    Apr:["OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG"],
+    Mei:["M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG"],
+    Jun:["PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT"],
+    Jul:["PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF"],
+    Ogos:["PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF"],
+    Sep:["OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M"],
+    Okt:["M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG"],
+    Nov:["M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT"],
+    Dis:["PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT"],
+  },
 };
-const MPAT={3:"Apr",4:"Mei",5:"Jun",6:"Jul",7:"Apr",8:"Mei",9:"Jun",10:"Jul",11:"Apr"};
+// Peta bulan ke kunci jadual (month index 0-based)
+const MPAT={3:"Apr",4:"Mei",5:"Jun",6:"Jul",7:"Ogos",8:"Sep",9:"Okt",10:"Nov",11:"Dis"};
 const MEMBERS=[
   {id:"M01",n:"MOHAMMAD ALLIF BIN MOHTAR",j:"IKTAR",s:"Alpha"},{id:"M02",n:"ABDULLAH BIN BAHUDIN",j:"IKTAR",s:"Alpha"},{id:"M03",n:"MUHAMMAD TARMIZI BIN ABDULLAH",j:"IKTAR",s:"Alpha"},{id:"M04",n:"MOHD AMINUDIN BIN DAUD",j:"IKTAR",s:"Alpha"},{id:"M05",n:"IRWAN SYAMIR BIN MOHD ZAINAL",j:"IKTAR",s:"Alpha"},{id:"M06",n:"AALIYA AAUNI BINTI MAT ZABIR",j:"IKTAR",s:"Alpha"},
   {id:"M07",n:"MUHAMMAD AMIRULLAH BIN ABDUL SALIM",j:"MHKL",s:"Alpha"},{id:"M08",n:"MOHD SOFIE BIN MOHD SHUKRI",j:"MHKL",s:"Alpha"},{id:"M09",n:"MUHAMAD FAHMIE BIN SAHRAN",j:"MHKL",s:"Alpha"},
@@ -417,7 +458,14 @@ function fmtT(ts){const d=new Date(ts+(8*3600000)+(new Date(ts).getTimezoneOffse
 function fmtDFull(ts){return new Date(ts+(8*3600000)+(new Date(ts).getTimezoneOffset()*60000)).toLocaleDateString("ms-MY",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});}
 
 // ═══ SHIFT ════════════════════════════════════════════
-function getShift(s,d){const p=MPAT[d.getMonth()];if(!p)return"OFF";const a=SCHED[s]?.[p];if(!a)return"OFF";return a[d.getDate()-1]||"OFF";}
+function getShift(shiftName,date){
+  const pat=MPAT[date.getMonth()];
+  if(!pat) return "OFF";
+  const arr=SCHED[shiftName]?.[pat];
+  if(!arr) return "OFF";
+  const val=arr[date.getDate()-1];
+  return val||"OFF";
+}
 function stNow(){const h=myt().getHours();return h>=7&&h<15?"PG":h>=15&&h<23?"PT":"M";}
 function slotTs(st){const d=myt(),Y=d.getFullYear(),Mo=d.getMonth(),D=d.getDate(),H=d.getHours();return SLOTS[st].map(h=>{let day=D;if(st==="M"&&h<12&&H>=12)day=D+1;return Date.UTC(Y,Mo,day,h,0,0,0)-(8*3600000);});}
 function bestSlot(mid,st){
@@ -1058,4 +1106,3 @@ setInterval(()=>{cache.date="";loadToday().then(()=>renderList());},300000); // 
 </script>
 </body>
 </html>
-
