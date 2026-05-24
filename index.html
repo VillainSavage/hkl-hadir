@@ -8,7 +8,9 @@
 <title>Sistem Kehadiran · HKL</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;max-width:430px;margin:0 auto;}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;max-width:480px;margin:0 auto;}
+@media(min-width:600px){body{max-width:800px;font-size:15px;}.card{border-radius:14px;}.top{padding:0 24px;height:60px;}.scroll{padding:20px;gap:16px;}.btn{padding:15px;}.row{padding:14px 20px;}}
+@media(min-width:1024px){body{max-width:1200px;}.page.show{flex-direction:row;flex-wrap:wrap;}.scroll{max-width:600px;}}
 .page{display:none;min-height:100dvh;flex-direction:column;}
 .page.show{display:flex;}
 .top{background:#1e293b;border-bottom:1px solid #334155;padding:env(safe-area-inset-top,0) 16px 0;display:flex;align-items:center;gap:10px;height:calc(52px + env(safe-area-inset-top,0));flex-shrink:0;}
@@ -93,13 +95,17 @@ textarea{resize:none;}
       </div>
     </div>
     <input type="text" id="srch" placeholder="🔍 Cari nama..." oninput="renderList()">
-    <div id="tabs" style="display:flex;gap:5px;overflow-x:auto;padding-bottom:2px;"></div>
+    <!-- Tab shift dibuang - sistem auto detect shift semasa -->
     <div class="card" id="mlist"></div>
     <div class="g2">
       <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openLeave()">📋 MC / EL / Cuti</button>
       <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openAdmin()">⚙ Pentadbir</button>
     </div>
     <button class="btn btn-ghost" style="font-size:13px;padding:12px;" onclick="openRehat()">🚪 &nbsp;Keluar Rehat / Masuk Semula</button>
+    <div class="g2">
+      <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openLaporan()">📊 &nbsp;Laporan Bulanan</button>
+      <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openLaporanLv()">📋 &nbsp;Laporan MC/EL/Cuti</button>
+    </div>
     <div style="height:6px;"></div>
   </div>
 </div>
@@ -280,6 +286,69 @@ textarea{resize:none;}
   </div>
 </div>
 
+<!-- ══ LAPORAN BULANAN ══════════════════════════════════════════ -->
+<div id="p-laporan" class="page">
+  <div class="top">
+    <button class="top-back" onclick="goSel()">‹</button>
+    <div style="flex:1;"><div class="top-title">Laporan Bulanan Kehadiran</div><div class="top-sub">Hanya Penyelia</div></div>
+    <button onclick="adminOut()" style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;">🔒 Keluar</button>
+  </div>
+  <div class="scroll">
+    <div class="card cp">
+      <div class="lbl">Pilih Bulan</div>
+      <select id="lap-month" onchange="renderLaporan()">
+        <option value="3">April 2026</option><option value="4">Mei 2026</option>
+        <option value="5">Jun 2026</option><option value="6">Julai 2026</option>
+        <option value="7">Ogos 2026</option><option value="8">September 2026</option>
+        <option value="9">Oktober 2026</option><option value="10">November 2026</option>
+        <option value="11">Disember 2026</option>
+      </select>
+    </div>
+    <!-- Summary cards -->
+    <div id="lap-summary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;"></div>
+    <!-- Per member table -->
+    <div class="card" id="lap-table"></div>
+    <div style="height:12px;"></div>
+  </div>
+</div>
+
+<!-- ══ LAPORAN MC/EL/CUTI ══════════════════════════════════════════ -->
+<div id="p-laporan-lv" class="page">
+  <div class="top">
+    <button class="top-back" onclick="goSel()">‹</button>
+    <div style="flex:1;"><div class="top-title">Laporan MC / EL / Cuti</div><div class="top-sub">Hanya Penyelia · Semakan & Kelulusan</div></div>
+    <button onclick="adminOut()" style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;">🔒 Keluar</button>
+  </div>
+  <div class="scroll">
+    <div class="card cp">
+      <div class="lbl">Tapis</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <select id="llv-month" onchange="renderLaporanLv()">
+          <option value="">Semua Bulan</option>
+          <option value="2026-04">April 2026</option><option value="2026-05">Mei 2026</option>
+          <option value="2026-06">Jun 2026</option><option value="2026-07">Julai 2026</option>
+          <option value="2026-08">Ogos 2026</option><option value="2026-09">September 2026</option>
+          <option value="2026-10">Oktober 2026</option><option value="2026-11">November 2026</option>
+          <option value="2026-12">Disember 2026</option>
+        </select>
+        <div class="g2">
+          <select id="llv-type" onchange="renderLaporanLv()">
+            <option value="">Semua Jenis</option>
+            <option>MC</option><option>EL</option><option>Cuti</option>
+          </select>
+          <select id="llv-status" onchange="renderLaporanLv()">
+            <option value="">Semua Status</option>
+            <option>Menunggu</option><option>Diluluskan</option><option>Ditolak</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="llv-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;"></div>
+    <div class="card" id="llv-list"></div>
+    <div style="height:12px;"></div>
+  </div>
+</div>
+
 <!-- ══ PIN ══════════════════════════════════════════ -->
 <div id="p-pin" class="page">
   <div class="top"><button class="top-back" onclick="goSel()">‹</button><div><div class="top-title">Log Masuk Penyelia</div><div class="top-sub">Masukkan PIN</div></div></div>
@@ -310,7 +379,7 @@ textarea{resize:none;}
     <div class="card cp">
       <div class="lbl">Tapis</div>
       <div class="gap" style="gap:7px;">
-        <select id="afsh" onchange="renderAdmin()"><option value="">Semua Shift</option><option>Alpha</option><option>Bravo</option><option>Charlie</option><option>Delta</option></select>
+        <!-- Shift auto ikut jadual anggota - tiada perlu pilih -->
         <select id="afjb" onchange="renderAdmin()"><option value="">Semua Jabatan</option><option>IKTAR</option><option>MHKL</option><option>RT</option><option>Wisma Rekod</option></select>
         <select id="afm"  onchange="renderAdmin()"></select>
         <select id="afd"  onchange="renderAdmin()"></select>
@@ -447,7 +516,7 @@ let curM=null,curSlot=0,curST="PT";
 let photo=null,photoTs=null,userLoc=null;
 let stream=null,camFace="user",tsTimer=null;
 let adminOk=false,pinBuf="",pinTarget="admin";
-let lvType="MC",lvFile=null,tabAct="all";
+let lvType="MC",lvFile=null;
 
 // ═══ TIME (MYT UTC+8) ═════════════════════════════════
 function myt(){const n=new Date();return new Date(n.getTime()+(8*3600000)+(n.getTimezoneOffset()*60000));}
@@ -510,19 +579,9 @@ function tick(){
 setInterval(tick,1000);tick();
 
 // ═══ MEMBER LIST ══════════════════════════════════════
-function buildTabs(){
-  const bar=document.getElementById("tabs");bar.innerHTML="";
-  [{id:"all",l:"Semua"},...["Alpha","Bravo","Charlie","Delta"].map(s=>({id:s,l:s}))].forEach(({id,l})=>{
-    const b=document.createElement("button"),on=tabAct===id;
-    b.style.cssText="padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid "+(on?"transparent":"#334155")+";background:"+(on?"#2563eb":"#1e293b")+";color:"+(on?"#fff":"#64748b")+";cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;";
-    b.textContent=l;b.onclick=()=>{tabAct=id;buildTabs();renderList();};
-    bar.appendChild(b);
-  });
-}
 function renderList(){
   const q=(document.getElementById("srch")||{}).value?.toLowerCase()||"",d=myt();
   let vis=MEMBERS;
-  if(tabAct!=="all")vis=vis.filter(m=>m.s===tabAct);
   if(q)vis=vis.filter(m=>m.n.toLowerCase().includes(q)||m.j.toLowerCase().includes(q));
 
   // Hanya tunjuk anggota yang bertugas shift SEKARANG sahaja
@@ -811,7 +870,7 @@ async function submitCI(){
 }
 
 // ═══ LEAVE ════════════════════════════════════════════
-function openLeave(){if(!adminOk){pinTarget="leave";pinBuf="";updDots();show("p-pin");return;}_openLeave();}
+function openLeave(){_openLeave();} // Anggota boleh submit sendiri - penyelia sahkan dalam laporan
 function _openLeave(){
   const sel=document.getElementById("lvm");sel.innerHTML='<option value="">— Pilih nama —</option>';
   MEMBERS.forEach(m=>{const o=document.createElement("option");o.value=m.id;o.textContent=m.n+" (Shift "+m.s+" · "+m.j+")";sel.appendChild(o);});
@@ -848,7 +907,12 @@ function openAdmin(){if(!adminOk){pinTarget="admin";pinBuf="";updDots();show("p-
 function adminOut(){adminOk=false;goSel();toast("🔒 Log keluar.");}
 function pk(v){if(v==="DEL"){pinBuf=pinBuf.slice(0,-1);}else if(v==="OK"){chkPin();return;}else if(pinBuf.length<10)pinBuf+=v;updDots();if(pinBuf.length===PIN.length)setTimeout(chkPin,120);}
 function updDots(){const el=document.getElementById("pindots");el.innerHTML="";for(let i=0;i<pinBuf.length;i++){const d=document.createElement("div");d.style.cssText="width:11px;height:11px;border-radius:50%;background:#3b82f6;";el.appendChild(d);}}
-function chkPin(){if(pinBuf===PIN){adminOk=true;pinBuf="";document.getElementById("pinerr").style.display="none";if(pinTarget==="leave")_openLeave();else _openAdmin();}else{pinBuf="";updDots();document.getElementById("pinerr").style.display="block";const b=document.getElementById("pinbox");b.style.animation="none";b.offsetHeight;b.style.animation="shake .4s ease";}}
+function chkPin(){if(pinBuf===PIN){adminOk=true;pinBuf="";document.getElementById("pinerr").style.display="none";
+  if(pinTarget==="leave")_openLeave();
+  else if(pinTarget==="rehat")_openRehat();
+  else if(pinTarget==="laporan"){renderLaporan();show("p-laporan");}
+  else if(pinTarget==="laporanlv"){renderLaporanLv();show("p-laporan-lv");}
+  else _openAdmin();}else{pinBuf="";updDots();document.getElementById("pinerr").style.display="block";const b=document.getElementById("pinbox");b.style.animation="none";b.offsetHeight;b.style.animation="shake .4s ease";}}
 
 // ═══ ADMIN ════════════════════════════════════════════
 async function _openAdmin(){
@@ -868,10 +932,10 @@ async function _openAdmin(){
   renderAdmin();show("p-admin");
 }
 async function renderAdmin(){
-  const fsh=document.getElementById("afsh").value,fjb=document.getElementById("afjb").value,fm=document.getElementById("afm").value,fd=document.getElementById("afd").value||todayStr();
+  const fjb=document.getElementById("afjb").value,fm=document.getElementById("afm").value,fd=document.getElementById("afd").value||todayStr();
   showLoad("Memuatkan rekod...");
-  let q_ci="?date=eq."+fd+(fsh?"&shift=eq."+fsh:"")+(fjb?"&jab=eq."+fjb:"")+(fm?"&mid=eq."+fm:"")+"&order=ts.desc";
-  let q_lv="?date=eq."+fd+(fsh?"&shift=eq."+fsh:"")+(fjb?"&jab=eq."+fjb:"")+(fm?"&mid=eq."+fm:"");
+  let q_ci="?date=eq."+fd+(fjb?"&jab=eq."+fjb:"")+(fm?"&mid=eq."+fm:"")+"&order=ts.desc";
+  let q_lv="?date=eq."+fd+(fjb?"&jab=eq."+fjb:"")+(fm?"&mid=eq."+fm:"");
   let dr=[],dl=[];
   try{[dr,dl]=await Promise.all([sbGet("checkins",q_ci),sbGet("leaves",q_lv)]);}catch(e){}
   hideLoad();
@@ -1099,8 +1163,206 @@ async function submitMasukSemula(){
   }
 }
 
+
+// ═══ LAPORAN BULANAN ══════════════════════════════════════════
+function openLaporan(){
+  if(!adminOk){pinTarget="laporan";pinBuf="";updDots();show("p-pin");return;}
+  // Set current month
+  const m=myt().getMonth();
+  const sel=document.getElementById("lap-month");
+  for(let i=0;i<sel.options.length;i++){if(parseInt(sel.options[i].value)===m){sel.selectedIndex=i;break;}}
+  renderLaporan();
+  show("p-laporan");
+}
+
+async function renderLaporan(){
+  const monthIdx=parseInt(document.getElementById("lap-month").value);
+  const year=2026;
+  const MNAMES=["","","","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+  const daysInMonth=new Date(year,monthIdx+1,0).getDate();
+
+  showLoad("Memuatkan laporan "+MNAMES[monthIdx]+"...");
+  const monthStr=year+"-"+z(monthIdx+1);
+  const q="?date=gte."+monthStr+"-01&date=lte."+monthStr+"-"+z(daysInMonth);
+  const [allCi, allLv] = await Promise.all([
+    sbGet("checkins",q+"&order=ts.asc"),
+    sbGet("leaves",q)
+  ]);
+  hideLoad();
+
+  const ciArr=Array.isArray(allCi)?allCi:[];
+  const lvArr=Array.isArray(allLv)?allLv:[];
+
+  // Summary
+  const totalSah=ciArr.filter(r=>r.valid&&!r.late).length;
+  const totalLewat=ciArr.filter(r=>r.valid&&r.late).length;
+  const totalGagal=ciArr.filter(r=>!r.valid).length;
+  const totalLv=lvArr.length;
+  document.getElementById("lap-summary").innerHTML=[
+    ["✅ Check-in Sah",totalSah,"#059669"],
+    ["⏰ Lewat",totalLewat,"#b45309"],
+    ["✗ Tidak Sah",totalGagal,"#dc2626"],
+    ["📋 MC/EL/Cuti",totalLv,"#7c3aed"]
+  ].map(([l,v,c])=>`<div style="background:${c}22;border:1px solid ${c}44;border-radius:8px;padding:10px 5px;text-align:center;">
+    <div style="font-size:20px;font-weight:800;color:${c};font-family:monospace;">${v}</div>
+    <div style="font-size:9px;color:${c};margin-top:2px;">${l}</div>
+  </div>`).join("");
+
+  // Per member table
+  // Susun mengikut shift anggota masing-masing
+  const members = MEMBERS;
+  const tbl=document.getElementById("lap-table");
+  tbl.innerHTML="";
+
+  // Group header by shift
+  const shiftOrder=["Alpha","Bravo","Charlie","Delta"];
+  const jc={IKTAR:"#60a5fa",MHKL:"#34d399",RT:"#fbbf24","Wisma Rekod":"#f472b6"};
+
+  shiftOrder.forEach(shiftName=>{
+    const shiftMembers=members.filter(m=>m.s===shiftName);
+    if(!shiftMembers.length) return;
+    // Shift header
+    const hdr=document.createElement("div");
+    hdr.style.cssText="padding:8px 14px;background:#0f172a;border-bottom:1px solid #334155;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748b;";
+    hdr.textContent="SHIFT "+shiftName.toUpperCase();
+    tbl.appendChild(hdr);
+
+    shiftMembers.forEach(m=>{
+    const mCi=ciArr.filter(r=>r.mid===m.id);
+    const mLv=lvArr.filter(r=>r.mid===m.id);
+    const sah=mCi.filter(r=>r.valid&&!r.late).length;
+    const lewat=mCi.filter(r=>r.valid&&r.late).length;
+    const gagal=mCi.filter(r=>!r.valid).length;
+    const lv=mLv.length;
+    // Calculate expected slots for this month (working days × 8)
+    let workSlots=0;
+    for(let d=1;d<=daysInMonth;d++){
+      const dt=new Date(year,monthIdx,d);
+      const st=getShift(m.s,dt);
+      if(st!=="OFF") workSlots+=8;
+    }
+    const tidakHadir=Math.max(0,workSlots-(sah+lewat));
+
+    const div=document.createElement("div");
+    div.style.cssText="padding:12px 14px;border-bottom:1px solid #1e293b;";
+    div.innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:700;flex:1;">${m.n}</div>
+        <div style="font-size:9px;color:#64748b;">${m.j} · ${m.s}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center;">
+        <div style="background:rgba(5,150,105,.15);border-radius:6px;padding:6px 2px;">
+          <div style="font-size:14px;font-weight:800;color:#34d399;">${sah}</div>
+          <div style="font-size:8px;color:#34d399;">Sah</div>
+        </div>
+        <div style="background:rgba(180,83,9,.15);border-radius:6px;padding:6px 2px;">
+          <div style="font-size:14px;font-weight:800;color:#fbbf24;">${lewat}</div>
+          <div style="font-size:8px;color:#fbbf24;">Lewat</div>
+        </div>
+        <div style="background:rgba(220,38,38,.15);border-radius:6px;padding:6px 2px;">
+          <div style="font-size:14px;font-weight:800;color:#f87171;">${gagal}</div>
+          <div style="font-size:8px;color:#f87171;">T.Sah</div>
+        </div>
+        <div style="background:rgba(220,38,38,.08);border-radius:6px;padding:6px 2px;">
+          <div style="font-size:14px;font-weight:800;color:rgba(248,113,113,.7);">${tidakHadir}</div>
+          <div style="font-size:8px;color:rgba(248,113,113,.7);">T.Hadir</div>
+        </div>
+        <div style="background:rgba(124,58,237,.15);border-radius:6px;padding:6px 2px;">
+          <div style="font-size:14px;font-weight:800;color:#c4b5fd;">${lv}</div>
+          <div style="font-size:8px;color:#c4b5fd;">MC/EL</div>
+        </div>
+      </div>
+      ${mCi.length>0?`<div style="margin-top:6px;font-size:9px;color:#64748b;font-family:monospace;">
+        Slot gagal: ${mCi.filter(r=>!r.valid).map(r=>fmtT(r.ts)+" ("+r.date+")").slice(0,3).join(", ")}${gagal>3?"...":""}
+      </div>`:""}
+    `;
+    tbl.appendChild(div);
+    }); // end shiftMembers
+  }); // end shiftOrder
+}
+
+// ═══ LAPORAN MC/EL/CUTI ═══════════════════════════════════════
+function openLaporanLv(){
+  if(!adminOk){pinTarget="laporanlv";pinBuf="";updDots();show("p-pin");return;}
+  renderLaporanLv();
+  show("p-laporan-lv");
+}
+
+async function renderLaporanLv(){
+  const monthF=document.getElementById("llv-month").value;
+  const typeF=document.getElementById("llv-type").value;
+  const statusF=document.getElementById("llv-status").value;
+
+  let q="?order=ts.desc";
+  if(monthF) q+="&date=gte."+monthF+"-01&date=lte."+monthF+"-31";
+  if(typeF) q+="&type=eq."+typeF;
+  if(statusF) q+="&status=eq."+statusF;
+
+  showLoad("Memuatkan laporan MC/EL/Cuti...");
+  const data=await sbGet("leaves",q);
+  hideLoad();
+  const arr=Array.isArray(data)?data:[];
+
+  // Summary
+  const mc=arr.filter(r=>r.type==="MC").length;
+  const el=arr.filter(r=>r.type==="EL").length;
+  const ct=arr.filter(r=>r.type==="Cuti").length;
+  document.getElementById("llv-summary").innerHTML=[
+    ["🏥 MC",mc,"#0e7490"],
+    ["🆘 Emergency",el,"#dc2626"],
+    ["📅 Cuti",ct,"#7c3aed"]
+  ].map(([l,v,c])=>`<div style="background:${c}22;border:1px solid ${c}44;border-radius:8px;padding:10px 5px;text-align:center;">
+    <div style="font-size:20px;font-weight:800;color:${c};font-family:monospace;">${v}</div>
+    <div style="font-size:9px;color:${c};margin-top:2px;">${l}</div>
+  </div>`).join("");
+
+  const list=document.getElementById("llv-list");
+  list.innerHTML="";
+  if(!arr.length){list.innerHTML='<div style="padding:24px;text-align:center;color:#64748b;">Tiada rekod.</div>';return;}
+
+  arr.forEach((r,i)=>{
+    const status=r.status||"Menunggu";
+    const sc=status==="Diluluskan"?"#34d399":status==="Ditolak"?"#f87171":"#fbbf24";
+    const div=document.createElement("div");
+    div.style.cssText="padding:14px;border-bottom:1px solid #1e293b;"+(i===arr.length-1?"border-bottom:none":"");
+    div.innerHTML=`
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        ${r.file&&r.file.startsWith("data:image")?
+          `<img src="${r.file}" style="width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid #334155;">`:
+          `<div style="width:52px;height:52px;border-radius:8px;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">${r.type==="MC"?"🏥":r.type==="EL"?"🆘":"📅"}</div>`
+        }
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:1px;">${r.jab} · Shift ${r.shift} · ${r.date}</div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:3px;font-style:italic;">${r.nota||"-"}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+            <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:${sc}22;color:${sc};border:1px solid ${sc}44;">${status}</span>
+            <span style="font-size:9px;color:#64748b;">${fmtT(r.ts)}</span>
+          </div>
+          ${status==="Menunggu"?`
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            <button onclick="approveLeave('${r.id}',true)" style="flex:1;padding:7px;border-radius:7px;background:rgba(5,150,105,.2);border:1px solid rgba(5,150,105,.4);color:#34d399;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✅ Luluskan</button>
+            <button onclick="approveLeave('${r.id}',false)" style="flex:1;padding:7px;border-radius:7px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.4);color:#f87171;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">❌ Tolak</button>
+          </div>`:""}
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+async function approveLeave(id, approve){
+  const status=approve?"Diluluskan":"Ditolak";
+  showLoad(approve?"Meluluskan...":"Menolak...");
+  // Update in Supabase using PATCH
+  const url=SUPABASE_URL+"/rest/v1/leaves?id=eq."+id;
+  const headers={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"};
+  await fetch(url,{method:"PATCH",headers,body:JSON.stringify({status,approved_by:"Penyelia"})});
+  hideLoad();
+  toast(approve?"✅ Diluluskan":"❌ Ditolak");
+  renderLaporanLv();
+}
 // ═══ INIT ═════════════════════════════════════════════
-buildTabs();
 loadToday().then(()=>renderList());
 setInterval(()=>{cache.date="";loadToday().then(()=>renderList());},300000); // refresh 5 minit
 </script>
