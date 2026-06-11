@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f172a">
-<title>Sistem Kehadiran · HKL</title>
+<title>Cawangan Keselamatan HKL</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;max-width:480px;margin:0 auto;}
@@ -80,7 +80,7 @@ textarea{resize:none;}
 <div id="p-select" class="page show">
   <div class="top">
     <span style="font-size:20px;">🏥</span>
-    <div style="flex:1;"><div class="top-title">Sistem Laporan Kehadiran</div><div class="top-sub">Hospital Kuala Lumpur · IKTAR · RT · MHKL</div></div>
+    <div style="flex:1;"><div class="top-title">Sistem Laporan Kehadiran</div><div class="top-sub">Cawangan Keselamatan · Hospital Kuala Lumpur</div></div>
     <div id="clk" style="font-size:13px;font-weight:700;color:#60a5fa;font-family:monospace;"></div>
   </div>
   <div class="scroll">
@@ -227,7 +227,6 @@ textarea{resize:none;}
   <div class="top">
     <button class="top-back" onclick="goSel()">‹</button>
     <div style="flex:1;"><div class="top-title">Rehat / Masuk Semula</div><div class="top-sub">Had rehat: 4 jam · Melebihi = Cuti Rehat</div></div>
-    <button onclick="goSel()" style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;">🔒 Keluar</button>
   </div>
   <div class="scroll">
     <!-- Status rehat anggota hari ini -->
@@ -237,25 +236,28 @@ textarea{resize:none;}
     </div>
 
     <div class="card cp">
-      <div class="lbl">Pilih Anggota</div>
-      <select id="rh-mem"></select>
+      <div class="lbl">Pilih Nama Anda</div>
+      <select id="rh-mem" onchange="setRhAction(rhAction)"></select>
     </div>
 
     <div class="card cp">
       <div class="lbl">Tindakan</div>
       <div class="g2">
-        <button class="btn btn-amber" id="rh-keluar-btn" onclick="setRhAction('keluar')" style="flex-direction:column;gap:4px;padding:12px;font-size:12px;">
-          <span style="font-size:22px;">🚪</span>Keluar Rehat
+        <button class="btn" id="rh-keluar-btn" onclick="setRhAction('keluar')" style="flex-direction:column;gap:4px;padding:14px;font-size:13px;background:#b45309;color:#fff;">
+          <span style="font-size:26px;">🚪</span>Keluar Rehat
         </button>
-        <button class="btn btn-ghost" id="rh-masuk-btn" onclick="setRhAction('masuk')" style="flex-direction:column;gap:4px;padding:12px;font-size:12px;">
-          <span style="font-size:22px;">✅</span>Masuk Semula
+        <button class="btn btn-ghost" id="rh-masuk-btn" onclick="setRhAction('masuk')" style="flex-direction:column;gap:4px;padding:14px;font-size:13px;">
+          <span style="font-size:26px;">✅</span>Masuk Semula
         </button>
       </div>
     </div>
 
     <div id="rh-info" style="display:none;"></div>
-
     <div id="rh-action-area"></div>
+    <div style="background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:8px;padding:11px 13px;">
+      <div style="font-size:11px;color:#93c5fd;font-weight:600;">ℹ️ Peringatan</div>
+      <div style="font-size:10px;color:#93c5fd;margin-top:4px;line-height:1.6;">Had rehat: <strong>4 jam</strong> sehari. Jika melebihi, wajib isi Cuti Rehat.<br>Selepas masuk semula, teruskan check-in seperti biasa.</div>
+    </div>
     <div style="height:8px;"></div>
   </div>
 </div>
@@ -380,7 +382,26 @@ textarea{resize:none;}
       <div class="lbl">Tapis</div>
       <div class="gap" style="gap:7px;">
         <!-- Shift auto ikut jadual anggota - tiada perlu pilih -->
-        <select id="afjb" onchange="renderAdmin()"><option value="">Semua Jabatan</option><option>IKTAR</option><option>MHKL</option><option>RT</option><option>Wisma Rekod</option></select>
+        <select id="afjb" onchange="renderAdmin()">
+  <option value="">Semua Jabatan/Unit</option>
+  <option>JABATAN IKTAR</option>
+  <option>BANGUNAN MHKL</option>
+  <option>JABATAN RADIOTERAPI (RT)</option>
+  <option>BANGUNAN WISMA REKOD</option>
+  <option>BANGUNAN UTAMA</option>
+  <option>JABATAN KECEMASAN</option>
+  <option>UNIT PATROL</option>
+  <option>JABATAN PEDIATRIK</option>
+  <option>JABATAN URO/NEFRO</option>
+  <option>JABATAN URO/NEFRO B</option>
+  <option>BANGUNAN SCACC</option>
+  <option>SCACC WAKTU PEJABAT</option>
+  <option>IUN WAKTU PEJABAT</option>
+  <option>GERAKAN, AMRA & CCTV</option>
+  <option>UNIT TUGAS KHAS</option>
+  <option>WAKTU PEJABAT /PENTADBIRAN</option>
+  <option>KOMPENI ECHO</option>
+</select>
         <select id="afm"  onchange="renderAdmin()"></select>
         <select id="afd"  onchange="renderAdmin()"></select>
       </div>
@@ -462,19 +483,374 @@ const SCHED={
 // Peta bulan ke kunci jadual (month index 0-based)
 const MPAT={3:"Apr",4:"Mei",5:"Jun",6:"Jul",7:"Ogos",8:"Sep",9:"Okt",10:"Nov",11:"Dis"};
 const MEMBERS=[
-  {id:"M01",n:"MOHAMMAD ALLIF BIN MOHTAR",j:"IKTAR",s:"Alpha"},{id:"M02",n:"ABDULLAH BIN BAHUDIN",j:"IKTAR",s:"Alpha"},{id:"M03",n:"MUHAMMAD TARMIZI BIN ABDULLAH",j:"IKTAR",s:"Alpha"},{id:"M04",n:"MOHD AMINUDIN BIN DAUD",j:"IKTAR",s:"Alpha"},{id:"M05",n:"IRWAN SYAMIR BIN MOHD ZAINAL",j:"IKTAR",s:"Alpha"},{id:"M06",n:"AALIYA AAUNI BINTI MAT ZABIR",j:"IKTAR",s:"Alpha"},
-  {id:"M07",n:"MUHAMMAD AMIRULLAH BIN ABDUL SALIM",j:"MHKL",s:"Alpha"},{id:"M08",n:"MOHD SOFIE BIN MOHD SHUKRI",j:"MHKL",s:"Alpha"},{id:"M09",n:"MUHAMAD FAHMIE BIN SAHRAN",j:"MHKL",s:"Alpha"},
-  {id:"M10",n:"YUSRI BIN YUNUS",j:"RT",s:"Alpha"},{id:"M11",n:"MOHD SHAIFUL NIZAM BIN HAMID",j:"RT",s:"Alpha"},{id:"M12",n:"SHAHRUL FITRI BIN ROSLI",j:"RT",s:"Alpha"},{id:"M13",n:"NANTHA GOPAL A/L AYASAMY",j:"RT",s:"Alpha"},
-  {id:"M14",n:"ZULKIFLI BIN YUSOF",j:"IKTAR",s:"Bravo"},{id:"M15",n:"MOHD ILHAM BIN YUSOF",j:"IKTAR",s:"Bravo"},{id:"M16",n:"MUHAMMAD ASREE BIN HAZIR",j:"IKTAR",s:"Bravo"},{id:"M17",n:"NOR AINA NAZIRA BINTI MOHD TARMIZI",j:"IKTAR",s:"Bravo"},{id:"M18",n:"AZLANNOR HADY BIN ABDUL TALIB",j:"IKTAR",s:"Bravo"},{id:"M19",n:"NORAZARIN BIN HUSSIN",j:"IKTAR",s:"Bravo"},
-  {id:"M20",n:"HAZLAN BIN MOHD RESDI",j:"MHKL",s:"Bravo"},{id:"M21",n:"ANASHATOL ARNAEDA BINTI JAFRI",j:"MHKL",s:"Bravo"},{id:"M22",n:"MOHAMMAD ALIF BIN NASARUDDIN",j:"MHKL",s:"Bravo"},
-  {id:"M23",n:"MOHD KHADAFEE BIN MD SAAD",j:"RT",s:"Bravo"},{id:"M24",n:"NOR AZURA BINTI MAMAT @ MUHAMAD",j:"RT",s:"Bravo"},{id:"M25",n:"MOHD SHAFIK BIN IBRAM",j:"RT",s:"Bravo"},{id:"M26",n:"ZULHILMI BIN ZAINUDIN",j:"RT",s:"Bravo"},
-  {id:"M27",n:"AZROL NAIM BIN AB MALEK",j:"IKTAR",s:"Charlie"},{id:"M28",n:"WAN NOR FATHIYYAH BINTI WAN AHMAD",j:"IKTAR",s:"Charlie"},{id:"M29",n:"MUHAMMAD ASHLEY BIN BASHIR",j:"IKTAR",s:"Charlie"},{id:"M30",n:"MOHD RASIDI BIN MOHD NASIR",j:"IKTAR",s:"Charlie"},{id:"M31",n:"MUHAMMAD ZULHELMI BIN AHMAD AFAMI",j:"IKTAR",s:"Charlie"},{id:"M32",n:"MUHAMMAD BADRI BIN ARIS",j:"IKTAR",s:"Charlie"},
-  {id:"M33",n:"MOHAMAD IZAT AFIFUDDIN BIN MOHAMAD AZMI",j:"MHKL",s:"Charlie"},{id:"M34",n:"AZELI BIN ZABER",j:"MHKL",s:"Charlie"},{id:"M35",n:"NORAZLIDA BINTI RAZAB",j:"MHKL",s:"Charlie"},
-  {id:"M36",n:"NUR AZIM BIN NASIRUDDIN",j:"RT",s:"Charlie"},{id:"M37",n:"SAIFUL YUSRIZAL BIN YAACOB",j:"RT",s:"Charlie"},{id:"M38",n:"FARRAH NATASHA BINTI ZULKAFLI",j:"RT",s:"Charlie"},{id:"M39",n:"MUHAMMAD AFIQ FAIZ BIN BADARUDDIN",j:"RT",s:"Charlie"},
-  {id:"M40",n:"RIMA BINTI OTHMAN",j:"IKTAR",s:"Delta"},{id:"M41",n:"MOHAMMAD FITHRI BIN AB LATIF",j:"IKTAR",s:"Delta"},{id:"M42",n:"MOHAMAD ALIFF HAIQAL BIN JAMIL",j:"IKTAR",s:"Delta"},{id:"M43",n:"LATIFA ROBANIA BINTI ABDUL RAZAK",j:"IKTAR",s:"Delta"},{id:"M44",n:"AHMAD SHAMIL BIN NADZRI",j:"IKTAR",s:"Delta"},{id:"M45",n:"ROHISHAM BIN MOHAMAD AROF",j:"IKTAR",s:"Delta"},
-  {id:"M46",n:"MOHD LUKMAN BIN HAMDAN",j:"MHKL",s:"Delta"},{id:"M47",n:"SUHAIRI BIN ISMAIL",j:"MHKL",s:"Delta"},{id:"M48",n:"NURSYUHADA BINTI MISNAN",j:"MHKL",s:"Delta"},
-  {id:"M49",n:"ROSARIZAM BIN SAMSUDIN",j:"RT",s:"Delta"},{id:"M50",n:"MUHAMMAD TARMIZI BIN SAZALI",j:"RT",s:"Delta"},{id:"M51",n:"KHAIROL ISZUWAN BIN ZAKARIA",j:"RT",s:"Delta"},{id:"M52",n:"MOHD NAZRI BIN ISMAIL",j:"RT",s:"Delta"},
-  {id:"M53",n:"MOHD RIDZUAN BIN BUKHRI",j:"Wisma Rekod",s:"Delta"},
+  {id:"M001",n:"KPL/PB MOHAMMAD ALLIF BIN MOHTAR",j:"JABATAN IKTAR",s:"Alpha"},
+  {id:"M002",n:"KPL/PB AHMAD SABRI BIN MARKON",j:"BANGUNAN WISMA REKOD",s:"Alpha"},
+  {id:"M003",n:"KPL/PB  AMANI BIN HASAN",j:"BANGUNAN SCACC",s:"Alpha"},
+  {id:"M004",n:"LKPL/PB ABDULLAH BIN BAHUDIN",j:"JABATAN IKTAR",s:"Alpha"},
+  {id:"M005",n:"LKPL/PB MOHD SHAKIR BIN BIDI",j:"BANGUNAN WISMA REKOD",s:"Alpha"},
+  {id:"M006",n:"LKPL/PB HALIM BIN MUHAMAD YATIM",j:"BANGUNAN SCACC",s:"Alpha"},
+  {id:"M007",n:"LKPL/PB MUHAMMAD TARMIZI BIN ABDULLAH",j:"JABATAN IKTAR",s:"Alpha"},
+  {id:"M008",n:"LKPL/PB MUHAMMAD ZULHILMI BIN ZULKAFFLI",j:"BANGUNAN WISMA REKOD",s:"Alpha"},
+  {id:"M009",n:"LKPL/PB MOHAMAD HARIRI BIN ABDU RAHIM",j:"BANGUNAN SCACC",s:"Alpha"},
+  {id:"M010",n:"KONST/PB MOHD AMINUDIN BIN DAUD",j:"JABATAN IKTAR",s:"Alpha"},
+  {id:"M011",n:"LKPL/PB MOHD HELMI BIN ALI",j:"BANGUNAN WISMA REKOD",s:"Alpha"},
+  {id:"M012",n:"KONST/PB MOHD AIDISHARIMAN BIN MARZUKI",j:"BANGUNAN SCACC",s:"Alpha"},
+  {id:"M013",n:"KONST/PB  IRWAN SYAMIR BIN MOHD ZAINAL",j:"JABATAN IKTAR",s:"Alpha"},
+  {id:"M014",n:"KONST/PB HAIRIZ AZRIN BIN ZAINUDIN",j:"BANGUNAN WISMA REKOD",s:"Alpha"},
+  {id:"M015",n:"KONST/PB ADAM BIN BORHAN",j:"BANGUNAN SCACC",s:"Alpha"},
+  {id:"M016",n:"PEL.PB AALIYA AAUNI BINTI MAT ZABIR",j:"JABATAN IKTAR",s:"Alpha"},
+  {id:"M017",n:"PEL.PB MOHD ERWAN SHAH BIN AZANAN",j:"BANGUNAN WISMA REKOD",s:"Alpha"},
+  {id:"M018",n:"LKPL/PB MOHD SHAHRUL AZHAR BIN ZUL NAZRI",j:"SCACC WAKTU PEJABAT",s:"Alpha"},
+  {id:"M019",n:"KPL/PB MOHD REDZUAN BIN AJIMIS",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M020",n:"KPL/PB MOHD HARYYZAN BIN TUMISAN",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M021",n:"KONST/PB MUHAMMAD ASREE BIN HAZIR",j:"SCACC WAKTU PEJABAT",s:"Alpha"},
+  {id:"M022",n:"LKPL/PB KAMARIAH BINTI AHMAD",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M023",n:"KONST/PB MOHD AZNUN BIN SAMSURI",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M024",n:"LKPL/PB MUHD KHAIRULNIZAM BIN ISMAIL",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M025",n:"KONST/PB MOHD FIRDAUS BIN ROSLI",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M026",n:"KONST/PB MOHD FAIZUL BIN FAUZI",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M027",n:"KONST/PB SULFAIZIL BIN SULONG",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M028",n:"KPL/PB AZIZAN BIN OMAR",j:"IUN WAKTU PEJABAT",s:"Alpha"},
+  {id:"M029",n:"KONST/PB  AHMAD SYAIBAN BIN RADZIUDIN",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M030",n:"KONST/PB NIK SUZAINI BINTI NIK SIN",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M031",n:"KPL/PB MD ABD JALIL BIN NAIMAT",j:"IUN WAKTU PEJABAT",s:"Alpha"},
+  {id:"M032",n:"KONST/PB FELLVEN FOOK PHEN",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M033",n:"KONST/PB MOHD SUHAIMI BIN AZIZ",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M034",n:"KONST/PB WAN SHAHRUL FAIZAL BIN WAN JUSOH",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M035",n:"KONST/PB ZUNAIDAH BINTI ALI",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M036",n:"KONST/PB MOHAMAD HABIBULLAH BIN  ZULKIFLI",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M037",n:"PEL.PB AZMI BIN ZAKARIA",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M038",n:"PEL.PB SITI SALWANI BINTI IBRAHIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Alpha"},
+  {id:"M039",n:"KONST/PB ADIF JEHAIKAL BIN JEMATIN@ALIE",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M040",n:"PEL.PB ENGKU MOHAMAD MUSSHAHFIZ RIZAL BIN ENGKU MUSTAPHA",j:"JABATAN KECEMASAN",s:"Alpha"},
+  {id:"M041",n:"LKPL/PB SYED FIRDAUS  BIN SYED BASARUDIN",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Alpha"},
+  {id:"M042",n:"PEL.PB MOHAMAD NOOR NAZREEN BIN MOHAMAD NOOR",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M043",n:"LKPL/PB WAN NORHAYATI BINTI WAN HANAPI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Alpha"},
+  {id:"M044",n:"PEL.PB TENGKU AZIZOL BIN TENGKU ADNAN",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M045",n:"LKPL/PB MOHD RIDZWAN BIN NOOR AZMI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Alpha"},
+  {id:"M046",n:"PEL.PB ALLIF FITRI BIN IBRAHIM",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M047",n:"KPL/PB DURAISIGAM A/L CHELLAMUTHU",j:"UNIT PATROL",s:"Alpha"},
+  {id:"M048",n:"KPL/PB MUHD AKBAR GUNTUR BIN KASIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Alpha"},
+  {id:"M049",n:"PEL.PB MAT SAHRIN BIN ZAKARIA",j:"BANGUNAN UTAMA",s:"Alpha"},
+  {id:"M050",n:"LKPL/PB MUHAMMAD  NASARUDDIN BIN MAT NATAR",j:"UNIT PATROL",s:"Alpha"},
+  {id:"M051",n:"KONST/PB MOHD SHARIL BIN NASIR",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Alpha"},
+  {id:"M052",n:"LKPL/PB ZULKARNAEN BIN YA\'ACOB",j:"UNIT PATROL",s:"Alpha"},
+  {id:"M053",n:"LKPL/PB AHMAD RIDZUAN BIN SHAZALI",j:"UNIT PATROL",s:"Alpha"},
+  {id:"M054",n:"KPL/PB VANMATHI A/P RAMAKRISHNAN",j:"JABATAN URO/NEFRO",s:"Alpha"},
+  {id:"M055",n:"LKPL/PB MOHD HANIF BIN KHAIRUDDIN",j:"UNIT PATROL",s:"Alpha"},
+  {id:"M056",n:"KONST/PB BAZILAH BINTI A.RAHAMAN",j:"KOMPENI ECHO",s:"Alpha"},
+  {id:"M057",n:"LKPL/PB FAZLI BIN ABDUL RAHMAN",j:"JABATAN URO/NEFRO",s:"Alpha"},
+  {id:"M058",n:"KONST/PB KHAIRUL AMIRIN BIN MUSTAFA",j:"UNIT PATROL",s:"Alpha"},
+  {id:"M059",n:"KONST/PB NURUL MAZIDAH BINTI ZULKIFLI",j:"KOMPENI ECHO",s:"Alpha"},
+  {id:"M060",n:"KONST/PB MOHAMMAD KHAIDIR BIN MOHAMMAD",j:"JABATAN URO/NEFRO",s:"Alpha"},
+  {id:"M061",n:"PEL.PB MUHAMAD IZHAM BIN JAMAL",j:"KOMPENI ECHO",s:"Alpha"},
+  {id:"M062",n:"KONST/PB MOHD ZAIDI BIN MUAZAM",j:"JABATAN URO/NEFRO",s:"Alpha"},
+  {id:"M063",n:"KONST/PB MOHAMMAD ANAS BIN AZIZ",j:"JABATAN URO/NEFRO",s:"Alpha"},
+  {id:"M064",n:"KPL/PB MUHAMMAD AMIRULLAH BIN ABDUL SALIM",j:"BANGUNAN MHKL",s:"Alpha"},
+  {id:"M065",n:"KONST/PB MUHAMMAD FAISAL ASYRAF BIN ISMAIL",j:"JABATAN URO/NEFRO",s:"Alpha"},
+  {id:"M066",n:"KONST/PB MOHD SOFIE BIN MOHD SHUKRI",j:"BANGUNAN MHKL",s:"Alpha"},
+  {id:"M067",n:"PEL.PB MUHAMAD FAHMIE BIN SAHRAN",j:"BANGUNAN MHKL",s:"Alpha"},
+  {id:"M068",n:"KPL/PB MOHD FARID BIN ISMAIL",j:"JABATAN URO/NEFRO B",s:"Alpha"},
+  {id:"M069",n:"LKPL/PB SITI SAMIRAH BINTI IBRAHIM",j:"JABATAN URO/NEFRO B",s:"Alpha"},
+  {id:"M070",n:"KPL/PB YUSRI BIN YUNUS",j:"JABATAN RADIOTERAPI (RT)",s:"Alpha"},
+  {id:"M071",n:"LKPL/PB MOHD FAIZ BIN MOHD ZAINI",j:"JABATAN URO/NEFRO B",s:"Alpha"},
+  {id:"M072",n:"LKPL/PB MOHD SHAIFUL NIZAM BIN  HAMID",j:"JABATAN RADIOTERAPI (RT)",s:"Alpha"},
+  {id:"M073",n:"KONST/PB AMILIAH BINTI TAKIMAN",j:"JABATAN URO/NEFRO B",s:"Alpha"},
+  {id:"M074",n:"KONST/PB SHAHRUL FITRI BIN ROSLI",j:"JABATAN RADIOTERAPI (RT)",s:"Alpha"},
+  {id:"M075",n:"PEL.PB NURUL AMIRAH BINTI MOHAMMAD",j:"JABATAN URO/NEFRO B",s:"Alpha"},
+  {id:"M076",n:"KONST/PB NANTHA GOPAL A/L AYASAMY",j:"JABATAN RADIOTERAPI (RT)",s:"Alpha"},
+  {id:"M077",n:"PEL.PB ZULKIFLI BIN DAUD",j:"JABATAN URO/NEFRO B",s:"Alpha"},
+  {id:"M078",n:"LKPL/PB SUHADA BINTI ZULKALNAINI",j:"GERAKAN, AMRA & CCTV",s:"Alpha"},
+  {id:"M079",n:"KPL/PB MOHD SHARUDDIN BIN ABDUL RASHID",j:"UNIT TUGAS KHAS",s:"Alpha"},
+  {id:"M080",n:"KONST/PB ABDUL HAFIZ BIN YAHYA",j:"GERAKAN, AMRA & CCTV",s:"Alpha"},
+  {id:"M081",n:"KONST/PB MOHAMMAD ZARIZAL BIN ZAKARIA",j:"UNIT TUGAS KHAS",s:"Alpha"},
+  {id:"M082",n:"LKPL/PB MOHAMAD SALEHUDDIN BIN AHMAD SAN",j:"GERAKAN, AMRA & CCTV",s:"Alpha"},
+  {id:"M083",n:"KONST/PB MUHAMMAD IKRAM B. ROSLAN",j:"UNIT TUGAS KHAS",s:"Alpha"},
+  {id:"M084",n:"LKPL/PB MUHAMAD SHAFIQ B. SALLEHHUDDIN",j:"GERAKAN, AMRA & CCTV",s:"Alpha"},
+  {id:"M085",n:"KONST/PB  SAFIZAN BIN SAIDIN",j:"UNIT TUGAS KHAS",s:"Alpha"},
+  {id:"M086",n:"KPL/PB MOHD IZWAN BIN MOHD IBRAHIM",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M087",n:"LKPL/PB NOOR AMERUL AMIN BIN NOOR HAZAM",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M088",n:"LKPL/PB MOHAMAD SYUKRI BIN ABDUL JAMIL",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M089",n:"KONST/PB NOOR FARIDAH BINTI MOHD",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M090",n:"KONST/PB NURAZIAH BINTI AHMAD ZAILANI",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M091",n:"PEL.PB MUHAMMAD HASIF FARHAN BIN PESILI",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M092",n:"PEL.PB NUR AFIFAH BINTI ABDUL MAJEED",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M093",n:"PEL.PB AHMAD ZAKUAN HAFIFI BIN IBRAHIM",j:"JABATAN PEDIATRIK",s:"Alpha"},
+  {id:"M094",n:"KPL/PB AZROL NAIM BIN AB MALEK",j:"JABATAN IKTAR",s:"Charlie"},
+  {id:"M095",n:"KPL/PB REDHUWAN BIN BASIR",j:"BANGUNAN WISMA REKOD",s:"Charlie"},
+  {id:"M096",n:"KPL/PB AMIR HAMZAH BIN MOHAMMAD",j:"BANGUNAN SCACC",s:"Charlie"},
+  {id:"M097",n:"KONST/PB  WAN NOR FATHIYYAH BINTI WAN AHMAD PENAMA",j:"JABATAN IKTAR",s:"Charlie"},
+  {id:"M098",n:"LKPL/PB MOHD AZIZOL BIN MOHAMAD NOOR",j:"BANGUNAN WISMA REKOD",s:"Charlie"},
+  {id:"M099",n:"LKPL/PB MOHD SHAMSUL KAMAL BIN IBRAHIM",j:"BANGUNAN SCACC",s:"Charlie"},
+  {id:"M100",n:"KONST/PB MUHAMMAD ASHLEY BIN BASHIR",j:"JABATAN IKTAR",s:"Charlie"},
+  {id:"M101",n:"LKPL/PB NUR AZIM BIN NASIRUDDIN",j:"BANGUNAN WISMA REKOD",s:"Charlie"},
+  {id:"M102",n:"LKPL/PB MOHD ASRAF BIN MUAZAM",j:"BANGUNAN SCACC",s:"Charlie"},
+  {id:"M103",n:"KONST/PB MOHD RASIDI BIN MOHD NASIR",j:"JABATAN IKTAR",s:"Charlie"},
+  {id:"M104",n:"KONST/PB  BADRUL HISYAM BIN ALIMIN",j:"BANGUNAN WISMA REKOD",s:"Charlie"},
+  {id:"M105",n:"KONST/PB  MUHAMAD AMAR BIN BAHARUDIN",j:"BANGUNAN SCACC",s:"Charlie"},
+  {id:"M106",n:"PEL.PB MUHAMMAD ZULHELMI BIN AHMAD AFAMI",j:"JABATAN IKTAR",s:"Charlie"},
+  {id:"M107",n:"KONST PB AHMAD NOR KAMIL BIN MOHAMAD",j:"BANGUNAN WISMA REKOD",s:"Charlie"},
+  {id:"M108",n:"KONST/PB MOHD JUHAIRY BIN AZLIM",j:"BANGUNAN SCACC",s:"Charlie"},
+  {id:"M109",n:"PEL.PB MUHAMMAD BADRI BIN ARIS",j:"JABATAN IKTAR",s:"Charlie"},
+  {id:"M110",n:"PEL.PB AHMAD FIKRI BIN AB. WAHAB",j:"BANGUNAN WISMA REKOD",s:"Charlie"},
+  {id:"M111",n:"LKPL/PB MOHD SHAHRUL AZHAR BIN ZUL NAZRI",j:"SCACC WAKTU PEJABAT",s:"Charlie"},
+  {id:"M112",n:"KPL/PB ABDUL SAHAB BIN AZAMUDIN",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M113",n:"KPL/PB RUMAIZI BIN AHMAD",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M114",n:"KONST/PB MUHAMMAD ASREE BIN HAZIR",j:"SCACC WAKTU PEJABAT",s:"Charlie"},
+  {id:"M115",n:"LKPL/PB MOHD SAIFUL BUKHARI BIN ABD SAMAD",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M116",n:"LKPL/PB MOHD IZUAN BIN SAMSUDDIN",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M117",n:"LKPL/PB MUHAMMAD RAFLI BIN YUNUS",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M118",n:"KONST/PB  MUHAMMAD NOR IQHRAM BIN ALI",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M119",n:"LKPL/PB MOHD FAIRUS BIN EMBUN",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M120",n:"PEL.PB SITI ZULAIKA BINTI SHAARI",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M121",n:"KPL/PB AZIZAN BIN OMAR",j:"IUN WAKTU PEJABAT",s:"Charlie"},
+  {id:"M122",n:"KONST/PB FADHIRUL ANUAR BIN RAMLI",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M123",n:"PEL.PB MOHAMMAD NOR HAFIS BIN ISMAIL",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M124",n:"KPL/PB MD ABD JALIL BIN NAIMAT",j:"IUN WAKTU PEJABAT",s:"Charlie"},
+  {id:"M125",n:"KONST/PB AL-MUZZAMMIL BIN MOHD RASHDI",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M126",n:"PEL.PB MOHD FADHIL BIN PAUDZI",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M127",n:"KONST/PB MUHAMAD RIZANI BIN ANWAR",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M128",n:"PEL.PB SAMSIAH BINTI MOHD HUSSIN",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M129",n:"KONST/PB MUHAMMAD SALIHIN BIN ABU KHASIM",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M130",n:"PEL.PB MOHAMMAD SYAFIQ BIN ABDUL RAHMAN",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M131",n:"PEL.PB SITI SALWANI BINTI IBRAHIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Charlie"},
+  {id:"M132",n:"KONST/PB  MOHAMAD KHAIRI ASWADI BIN RAFEEI",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M133",n:"PEL.PB NOOR RAHIM BIN MAT TAHA@MOHAMMED TALHA",j:"JABATAN KECEMASAN",s:"Charlie"},
+  {id:"M134",n:"LKPL/PB SYED FIRDAUS  BIN SYED BASARUDIN",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Charlie"},
+  {id:"M135",n:"PEL.PB  MOHAMMED IZUL AIZAL BIN MOHAMMAD NASIR",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M136",n:"LKPL/PB WAN NORHAYATI BINTI WAN HANAPI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Charlie"},
+  {id:"M137",n:"PEL.PB NOOR HAFFISZULL HUSSRIN BIN SALLEH",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M138",n:"LKPL/PB MOHD RIDZWAN BIN NOOR AZMI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Charlie"},
+  {id:"M139",n:"PEL.PB SITI AISHAH BINTI ABDUL RASHID",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M140",n:"KPL/PB SHAMSUL AZRI BIN MUHAMAD AZHAR",j:"UNIT PATROL",s:"Charlie"},
+  {id:"M141",n:"KPL/PB MUHD AKBAR GUNTUR BIN KASIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Charlie"},
+  {id:"M142",n:"PEL.PB MOHAMAD FADLI BIN AWANG",j:"BANGUNAN UTAMA",s:"Charlie"},
+  {id:"M143",n:"LKPL/PB MOHD SYAWAL BIN ALIAS",j:"UNIT PATROL",s:"Charlie"},
+  {id:"M144",n:"KONST/PB MOHD SHARIL BIN NASIR",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Charlie"},
+  {id:"M145",n:"LKPL/PB MUHAMAD HARIS BIN MOHAMAD",j:"UNIT PATROL",s:"Charlie"},
+  {id:"M146",n:"LKPL/PB AZERI BIN AZIZ",j:"UNIT PATROL",s:"Charlie"},
+  {id:"M147",n:"KPL/PB MOHD KHAIRIL HASWAD BIN DERAMAN",j:"JABATAN URO/NEFRO",s:"Charlie"},
+  {id:"M148",n:"KONST/PB MOHAMAD ZAMRI BIN CHEK MAY",j:"UNIT PATROL",s:"Charlie"},
+  {id:"M149",n:"KONST/PB BAZILAH BINTI A.RAHAMAN",j:"KOMPENI ECHO",s:"Charlie"},
+  {id:"M150",n:"LKPL/PB AZRI HISYAM BIN MUSTAFA",j:"JABATAN URO/NEFRO",s:"Charlie"},
+  {id:"M151",n:"KONST/PB MOHD FAISAL BIN SENIN",j:"UNIT PATROL",s:"Charlie"},
+  {id:"M152",n:"KONST/PB NURUL MAZIDAH BINTI ZULKIFLI",j:"KOMPENI ECHO",s:"Charlie"},
+  {id:"M153",n:"LKPL/PB SAFIRAH BINTI AHMAD SABRY",j:"JABATAN URO/NEFRO",s:"Charlie"},
+  {id:"M154",n:"PEL.PB MUHAMAD IZHAM BIN JAMAL",j:"KOMPENI ECHO",s:"Charlie"},
+  {id:"M155",n:"KONST/PB ILIAS BIN MOHAMAD",j:"JABATAN URO/NEFRO",s:"Charlie"},
+  {id:"M156",n:"KONST/PB ABDUL HALIM BIN MOHD JAMALIDIN",j:"JABATAN URO/NEFRO",s:"Charlie"},
+  {id:"M157",n:"KPL/PB MOHAMAD IZAT AFIFUDDIN BIN MOHAMAD AZMI",j:"BANGUNAN MHKL",s:"Charlie"},
+  {id:"M158",n:"KONST/PB MUHAMMAD IQWAN BIN ROSLI",j:"JABATAN URO/NEFRO",s:"Charlie"},
+  {id:"M159",n:"LKPL/PB  AZELI BIN ZABER",j:"BANGUNAN MHKL",s:"Charlie"},
+  {id:"M160",n:"PEL.PB NORAZLIDA BINTI RAZAB",j:"BANGUNAN MHKL",s:"Charlie"},
+  {id:"M161",n:"KPL/PB MOHD FAUZI AZMI BIN AHMAD ABADI",j:"JABATAN URO/NEFRO B",s:"Charlie"},
+  {id:"M162",n:"KONST/PB MUHAMAD FAIS BIN MAT ROS",j:"JABATAN URO/NEFRO B",s:"Charlie"},
+  {id:"M163",n:"KPL/PB MOHD FAHMIE BIN HAMIL",j:"JABATAN RADIOTERAPI (RT)",s:"Charlie"},
+  {id:"M164",n:"KONST/PB MUHAMMAD RIDUWAN BIN SAMSUDDIN",j:"JABATAN URO/NEFRO B",s:"Charlie"},
+  {id:"M165",n:"LKPL/PB SAIFUL YUSRIZAL BIN YAACOB",j:"JABATAN RADIOTERAPI (RT)",s:"Charlie"},
+  {id:"M166",n:"KONST/PB NORASHIKIN BINTI SHARUL",j:"JABATAN URO/NEFRO B",s:"Charlie"},
+  {id:"M167",n:"LKPL/PB FARRAH NATASHA BINTI ZULKAFLI",j:"JABATAN RADIOTERAPI (RT)",s:"Charlie"},
+  {id:"M168",n:"PEL.PB ADLI ZIL IKRAM BIN MOOSTAFA",j:"JABATAN URO/NEFRO B",s:"Charlie"},
+  {id:"M169",n:"KONST/PB MUHAMMAD AFIQ FAIZ BIN BADARUDDIN",j:"JABATAN RADIOTERAPI (RT)",s:"Charlie"},
+  {id:"M170",n:"KPL/PB MOHD AZIMUDDIN BIN MOHAMAD NOR",j:"GERAKAN, AMRA & CCTV",s:"Charlie"},
+  {id:"M171",n:"LKPL/PB MOHD FAZLI AZRIN BIN ZAINAL ABIDIN",j:"UNIT TUGAS KHAS",s:"Charlie"},
+  {id:"M172",n:"LKPL/PB MOHD HANIF BIN MAT JAAFAR",j:"GERAKAN, AMRA & CCTV",s:"Charlie"},
+  {id:"M173",n:"KONST/PB MUHAMMAD NURUDIN BIN AZMI",j:"UNIT TUGAS KHAS",s:"Charlie"},
+  {id:"M174",n:"KONST/PB MOHAMMAD WAJDI BIN JUSOH",j:"GERAKAN, AMRA & CCTV",s:"Charlie"},
+  {id:"M175",n:"KONST/PB MOHD FAHMI BIN ABDUL MALIK",j:"UNIT TUGAS KHAS",s:"Charlie"},
+  {id:"M176",n:"KONST/PB MOHAMMAD AMIRUL ASRAH BIN ISHAK",j:"GERAKAN, AMRA & CCTV",s:"Charlie"},
+  {id:"M177",n:"KPL/PB MOHD ZULQARNAIN BIN HAMDAN",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M178",n:"LKPL/PB MOHD HAFIZ BIN OMAR",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M179",n:"KONST/PB MOHD AZLAN BIN SHUHAIMI",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M180",n:"KONST/PB AMIRUL LOKMAN BIN AMIN",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M181",n:"KONST/PB MOHD KHALID BIN MOHD KAMARUDIN",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M182",n:"KONST/PB SYAIFUL AZUAD BIN ALIAS",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M183",n:"PEL.PB MOHAMAD SYAFIQ BIN MAT NAWI",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M184",n:"PEL.PB NUR IZZATI BINTI KAMARULDZAMAN",j:"JABATAN PEDIATRIK",s:"Charlie"},
+  {id:"M185",n:"KPL/PB RIMA BINTI OTHMAN",j:"JABATAN IKTAR",s:"Delta"},
+  {id:"M186",n:"KPL/PB MOHD SHAHRULNIZAM BIN SUAIDI",j:"BANGUNAN WISMA REKOD",s:"Delta"},
+  {id:"M187",n:"KPL/PB MOHD NAZIMAN BIN MANSOR",j:"BANGUNAN SCACC",s:"Delta"},
+  {id:"M188",n:"LKPL/PB UMAR BIN SAAD",j:"JABATAN IKTAR",s:"Delta"},
+  {id:"M189",n:"LKPL/PB MOHD LIZAL BIN BANIYAMIN",j:"BANGUNAN WISMA REKOD",s:"Delta"},
+  {id:"M190",n:"LKPL/PB MOHD RAZIF BIN ANUAR",j:"BANGUNAN SCACC",s:"Delta"},
+  {id:"M191",n:"KONST/PB MOHAMMAD FITHRI BIN AB LATIF@ ABD LATIF",j:"JABATAN IKTAR",s:"Delta"},
+  {id:"M192",n:"LKPL/PB SAIFUL BIN MD NOR",j:"BANGUNAN WISMA REKOD",s:"Delta"},
+  {id:"M193",n:"KONST/PB MUHAMAD RAWANDI BIN AB RAHIM",j:"BANGUNAN SCACC",s:"Delta"},
+  {id:"M194",n:"KONST/PB MOHAMAD ALIFF HAIQAL BIN JAMIL",j:"JABATAN IKTAR",s:"Delta"},
+  {id:"M195",n:"KONST/PB  WAN MUHAMMAD ZAHIER BIN ZAIDIN",j:"BANGUNAN WISMA REKOD",s:"Delta"},
+  {id:"M196",n:"KONST/PB MAT YUSOF BIN NAIN",j:"BANGUNAN SCACC",s:"Delta"},
+  {id:"M197",n:"PEL.PB LATIFA ROBANIA BINTI ABDUL RAZAK",j:"JABATAN IKTAR",s:"Delta"},
+  {id:"M198",n:"KONST/PB  MUHAMMAD FARID BIN ISMAIL",j:"BANGUNAN WISMA REKOD",s:"Delta"},
+  {id:"M199",n:"PEL.PB MOHD KHAIRUL AMRY BIN ABD KADIR",j:"BANGUNAN SCACC",s:"Delta"},
+  {id:"M200",n:"PEL.PB AHMAD SHAMIL BIN NADZRI",j:"JABATAN IKTAR",s:"Delta"},
+  {id:"M201",n:"PEL.PB MOHD RIDZUAN BIN BUKHRI",j:"BANGUNAN WISMA REKOD",s:"Delta"},
+  {id:"M202",n:"LKPL/PB MOHD SHAHRUL AZHAR BIN ZUL NAZRI",j:"SCACC WAKTU PEJABAT",s:"Delta"},
+  {id:"M203",n:"KPL/PB MOHD ASNUR BIN NORDIN",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M204",n:"KPL/PB KHAIRUL NIZAM BIN SHAHARUDDIN",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M205",n:"KONST/PB MUHAMMAD ASREE BIN HAZIR",j:"SCACC WAKTU PEJABAT",s:"Delta"},
+  {id:"M206",n:"KONST/PB MOHD SABRI BIN ABD AZIZ",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M207",n:"LKPL/PB MUHAMMAD AZHARI BIN JAAFAR",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M208",n:"KONST/PB  SYED SAHARUDDIN BIN SYED YUSOFF",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M209",n:"LKPL/PB SAYED MUHAMMAD MOKHLESIN BIN SAYED UMAR",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M210",n:"KONST/PB AZIDUN MUHAMMAD ZULKIFLI BIN ARIFFIN",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M211",n:"LKPL/PB MOHD NORMAN HASRUL HISAM BIN DERAMAN",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M212",n:"KPL/PB AZIZAN BIN OMAR",j:"IUN WAKTU PEJABAT",s:"Delta"},
+  {id:"M213",n:"KONST/PB ABDUL HAIMIN BIN ABDUL HAMID",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M214",n:"LKPL/PB ZAINUDIN BIN ZAINON",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M215",n:"KPL/PB MD ABD JALIL BIN NAIMAT",j:"IUN WAKTU PEJABAT",s:"Delta"},
+  {id:"M216",n:"KONST/PB  NAZREEN BIN NAJIL",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M217",n:"KONST/PB HAIRI AZWAD BIN MOHD SATAR",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M218",n:"KONST/PB ARIFF SHAZWAN BIN YAHAYA",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M219",n:"PEL.PB NUR ASYIKIN BINTI MOHD NOOR",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M220",n:"KONST/PB MOHD ZALI HAN BIN ROSLAN",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M221",n:"PEL.PB MUHAMAD HAFIZAL BIN ZAINAL ABIDIN",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M222",n:"PEL.PB SITI SALWANI BINTI IBRAHIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Delta"},
+  {id:"M223",n:"KONST/PB CHRISTOPHER BIN JAMES",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M224",n:"PEL.PB NUR SYARAFANA LAILI BINTI OTHMAN",j:"JABATAN KECEMASAN",s:"Delta"},
+  {id:"M225",n:"LKPL/PB SYED FIRDAUS  BIN SYED BASARUDIN",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Delta"},
+  {id:"M226",n:"PEL.PB MUHAMMAD AL-AIMRAN BIN ABD ALI",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M227",n:"LKPL/PB WAN NORHAYATI BINTI WAN HANAPI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Delta"},
+  {id:"M228",n:"PEL.PB MUHAMMAD SYARIFUDDIN BIN MUHAMMAD LATPI",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M229",n:"LKPL/PB MOHD RIDZWAN BIN NOOR AZMI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Delta"},
+  {id:"M230",n:"PEL.PB MOHD AZUARIESHAM BIN MUSTAPHA",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M231",n:"KPL/PB AHMAD FIRDAUS BIN MHD NAIM",j:"UNIT PATROL",s:"Delta"},
+  {id:"M232",n:"KPL/PB MUHD AKBAR GUNTUR BIN KASIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Delta"},
+  {id:"M233",n:"PEL.PB MOHD ZAHIDI BIN MUKHTAR",j:"BANGUNAN UTAMA",s:"Delta"},
+  {id:"M234",n:"LKPL/PB AZAHA BIN MAT DIAH",j:"UNIT PATROL",s:"Delta"},
+  {id:"M235",n:"KONST/PB MOHD SHARIL BIN NASIR",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Delta"},
+  {id:"M236",n:"KONST/PB NURSYARIFUDDIN BIN ISMAIL",j:"UNIT PATROL",s:"Delta"},
+  {id:"M237",n:"KONST/PB SHAHRUL EFFENDY BIN ABDUL MUID",j:"UNIT PATROL",s:"Delta"},
+  {id:"M238",n:"KPL/PB SHAHRUL AL HAFIS BIN SHAARI",j:"JABATAN URO/NEFRO",s:"Delta"},
+  {id:"M239",n:"KONST/PB ABDUL SALLEHS BIN AB RAHMAN",j:"UNIT PATROL",s:"Delta"},
+  {id:"M240",n:"KONST/PB BAZILAH BINTI A.RAHAMAN",j:"KOMPENI ECHO",s:"Delta"},
+  {id:"M241",n:"LKPL/PB MOHAMAD NOR KHAIRUL BIN KEFLI",j:"JABATAN URO/NEFRO",s:"Delta"},
+  {id:"M242",n:"KONST/PB MUHAMMAD HAZIQ HAKIMI BIN MOHD NORANI",j:"UNIT PATROL",s:"Delta"},
+  {id:"M243",n:"KONST/PB NURUL MAZIDAH BINTI ZULKIFLI",j:"KOMPENI ECHO",s:"Delta"},
+  {id:"M244",n:"KONST/PB YAAKOB BIN ZAINAL ABIDIN",j:"JABATAN URO/NEFRO",s:"Delta"},
+  {id:"M245",n:"PEL.PB MUHAMAD IZHAM BIN JAMAL",j:"KOMPENI ECHO",s:"Delta"},
+  {id:"M246",n:"KONST/PB SAIFUL NIZAM BIN ROSLI",j:"JABATAN URO/NEFRO",s:"Delta"},
+  {id:"M247",n:"PEL.PB HALIMATUN SSAADIAH BINTI ABD HALIM",j:"JABATAN URO/NEFRO",s:"Delta"},
+  {id:"M248",n:"KPL/PB MOHD LUKMAN BIN HAMDAN",j:"BANGUNAN MHKL",s:"Delta"},
+  {id:"M249",n:"PEL.PB MOHD ROSLI BIN MAT SHARIFF",j:"JABATAN URO/NEFRO",s:"Delta"},
+  {id:"M250",n:"KONST/PB  SUHAIRI BIN ISMAIL",j:"BANGUNAN MHKL",s:"Delta"},
+  {id:"M251",n:"PEL.PB NURSYUHADA BINTI MISNAN",j:"BANGUNAN MHKL",s:"Delta"},
+  {id:"M252",n:"KPL/PB SYED SHARIZAN BIN SYED ALI",j:"JABATAN URO/NEFRO B",s:"Delta"},
+  {id:"M253",n:"LKPL/PB SHARIZAN BIN AMATHU",j:"JABATAN URO/NEFRO B",s:"Delta"},
+  {id:"M254",n:"KPL/PB ROSARIZAM BIN SAMSUDIN",j:"JABATAN RADIOTERAPI (RT)",s:"Delta"},
+  {id:"M255",n:"LKPL/PB MUHAMMAD NAZRI BIN MUHAMAD YASIN",j:"JABATAN URO/NEFRO B",s:"Delta"},
+  {id:"M256",n:"LKPL/PB MUHAMMAD TARMIZI BIN SAZALI",j:"JABATAN RADIOTERAPI (RT)",s:"Delta"},
+  {id:"M257",n:"KONST/PB MOHAMAD SHAFIQ BIN RAHMAD",j:"JABATAN URO/NEFRO B",s:"Delta"},
+  {id:"M258",n:"KONST/PB KHAIROL ISZUWAN BIN ZAKARIA",j:"JABATAN RADIOTERAPI (RT)",s:"Delta"},
+  {id:"M259",n:"PEL.PB NURUAFIKAR BINTI SHARIFF",j:"JABATAN URO/NEFRO B",s:"Delta"},
+  {id:"M260",n:"KONST/PB MOHD NAZRI BIN ISMAIL",j:"JABATAN RADIOTERAPI (RT)",s:"Delta"},
+  {id:"M261",n:"KONST/PB MOHAMAD SHAHMIR BIN SHAMSUDDIN",j:"GERAKAN, AMRA & CCTV",s:"Delta"},
+  {id:"M262",n:"KPL/PB NORHAFISZUDOIN BIN MOHD SUSAH",j:"UNIT TUGAS KHAS",s:"Delta"},
+  {id:"M263",n:"KONST/PB NIK NOR HASLINI BINTI NIK LAH",j:"GERAKAN, AMRA & CCTV",s:"Delta"},
+  {id:"M264",n:"KONST/PB ELIAS BIN OMAR",j:"UNIT TUGAS KHAS",s:"Delta"},
+  {id:"M265",n:"KONST/PB  MOHD ABD HADI BIN MOHD NOOR",j:"GERAKAN, AMRA & CCTV",s:"Delta"},
+  {id:"M266",n:"KONST/PB MOHD MIRZA ANNUR BIN A.RAHIM",j:"UNIT TUGAS KHAS",s:"Delta"},
+  {id:"M267",n:"KONST/PB KHAIRUL ANWAR BIN HARUN",j:"GERAKAN, AMRA & CCTV",s:"Delta"},
+  {id:"M268",n:"KPL/PB NAIZAH BINTI DALI",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M269",n:"LKPL/PB ZUKIFLI BIN DAUD",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M270",n:"LKPL/PB MOHD HUZAIFAH BIN AS\'AD",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M271",n:"KONST/PB MARSITA BINTI MOHATAR",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M272",n:"KONST/PB NURUL SUWANA BINTI  ABU BAKAR",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M273",n:"KONST/PB KHAIRIL BIN ANUAR",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M274",n:"PEL.PB AHMAD FAHMIN BIN MA\'ROF",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M275",n:"PEL.PB MOHAMAD ADI BIN PALI",j:"JABATAN PEDIATRIK",s:"Delta"},
+  {id:"M276",n:"KPL/PB MUHD FIRDAUS BIN TAHIR",j:"JABATAN IKTAR",s:"Bravo"},
+  {id:"M277",n:"KPL/PB AHMAD SYUKRI BIN MOHEE",j:"BANGUNAN WISMA REKOD",s:"Bravo"},
+  {id:"M278",n:"KPL/PB SANI BIN SALIMAN",j:"BANGUNAN SCACC",s:"Bravo"},
+  {id:"M279",n:"LKPL/PB MOHD YUZAIDEE BIN YAZID",j:"JABATAN IKTAR",s:"Bravo"},
+  {id:"M280",n:"LKPL/PB SYAHARUL NIZAM BIN MOHD ARIFFIN",j:"BANGUNAN WISMA REKOD",s:"Bravo"},
+  {id:"M281",n:"KONST/PB  AHMAD HAFIZUL BIN JABAR",j:"BANGUNAN SCACC",s:"Bravo"},
+  {id:"M282",n:"LKPL/PB MOHAMAD IRWAN BIN AHMAD TERMIZY",j:"JABATAN IKTAR",s:"Bravo"},
+  {id:"M283",n:"LKPL/PB  MOHD SALMIZAN BIN CHE RAZALI",j:"BANGUNAN WISMA REKOD",s:"Bravo"},
+  {id:"M284",n:"KONST/PB SHAHRIZAL BIN ABDUL AZIZ",j:"BANGUNAN SCACC",s:"Bravo"},
+  {id:"M285",n:"LKPL/PB MOHAMAD ADI BIN MOHD NORDIN",j:"JABATAN IKTAR",s:"Bravo"},
+  {id:"M286",n:"KONST/PB MOHD JASRI BIN HASSAN",j:"BANGUNAN WISMA REKOD",s:"Bravo"},
+  {id:"M287",n:"KONST/PB MUHAMMAD ZUL AIMAN BIN ZAINI",j:"BANGUNAN SCACC",s:"Bravo"},
+  {id:"M288",n:"KONST/PB MOHD ILHAM BIN YUSOF",j:"JABATAN IKTAR",s:"Bravo"},
+  {id:"M289",n:"PEL.PB MOHD RAFANDI BIN REMLI",j:"BANGUNAN WISMA REKOD",s:"Bravo"},
+  {id:"M290",n:"PEL.PB MUHAMMAD SAIFUL AILMI BIN ZAINUDDIN",j:"BANGUNAN SCACC",s:"Bravo"},
+  {id:"M291",n:"PEL.PB NOR AINA NAZIRA BINTI MOHD TARMIZI",j:"JABATAN IKTAR",s:"Bravo"},
+  {id:"M292",n:"PEL.PB IZZUDDIN BIN ISMAIL",j:"BANGUNAN WISMA REKOD",s:"Bravo"},
+  {id:"M293",n:"LKPL/PB MOHD SHAHRUL AZHAR BIN ZUL NAZRI",j:"SCACC WAKTU PEJABAT",s:"Bravo"},
+  {id:"M294",n:"KPL/PB SARUL AFENDY BIN SAARI",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M295",n:"KPL/PB MUHAMAD NOR AZERI BIN SULAIMAN",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M296",n:"KONST/PB MUHAMMAD ASREE BIN HAZIR",j:"SCACC WAKTU PEJABAT",s:"Bravo"},
+  {id:"M297",n:"LKPL/PB MOHD ZULKIFLI BIN KAMARUDDIN",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M298",n:"LKPL/PB AHMAD HAZREEN BIN CHE ARIFIN",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M299",n:"LKPL/PB AHMAD FARIZ BIN MOHAMAD AKHIR",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M300",n:"LKPL/PB MOHD HANIF BIN MOHD ZAINUDDIN",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M301",n:"KONST/PB MUHAMMAD ALIF FAHMY BIN AZLAN",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M302",n:"LKPL/PB HARIZAL AZLI BIN ABD RAHMAN",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M303",n:"KPL/PB AZIZAN BIN OMAR",j:"IUN WAKTU PEJABAT",s:"Bravo"},
+  {id:"M304",n:"KONST/PB SAINTI RAIKOL",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M305",n:"KONST/PB MUHAMMAD AIDHIL BIN AHMAD",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M306",n:"KPL/PB MD ABD JALIL BIN NAIMAT",j:"IUN WAKTU PEJABAT",s:"Bravo"},
+  {id:"M307",n:"KONST/PB ZULAZMI BIN JANI",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M308",n:"KONST/PB MOHD FARID BIN AHMAD SHUHAIMI",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M309",n:"KONST/PB MOHD FARID IMRAN BIN IBRAHIM",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M310",n:"PEL.PB NOOR ASMA HUSNA BINTI ZAMANI",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M311",n:"PEL.PB MOHAMAD AMIRUDDIN BIN BAHRIN",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M312",n:"PEL.PB MOHD SARIMAN BIN YAACOB",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M313",n:"PEL.PB SITI SALWANI BINTI IBRAHIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Bravo"},
+  {id:"M314",n:"PEL.PB MUHAMMAD SYAHIRAN BIN MOKHTAR",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M315",n:"PEL.PB MOHAMAD SYAIRIL BIN ATAN",j:"JABATAN KECEMASAN",s:"Bravo"},
+  {id:"M316",n:"LKPL/PB SYED FIRDAUS  BIN SYED BASARUDIN",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Bravo"},
+  {id:"M317",n:"PEL.PB AMEERUL DAIM BIN IBRAHIM",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M318",n:"LKPL/PB WAN NORHAYATI BINTI WAN HANAPI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Bravo"},
+  {id:"M319",n:"PEL.PB WAN AISHAH BINTI WAN HUSAIN",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M320",n:"LKPL/PB MOHD RIDZWAN BIN NOOR AZMI",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Bravo"},
+  {id:"M321",n:"PEL.PB MOHAMMAD LATIF BIN MOHD TAIB",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M322",n:"KPL/PB EZWAN BIN ABD. AZIZ",j:"UNIT PATROL",s:"Bravo"},
+  {id:"M323",n:"KPL/PB MUHD AKBAR GUNTUR BIN KASIM",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Bravo"},
+  {id:"M324",n:"PEL.PB VINONDRAN A/L VENA GOBAL",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M325",n:"LKPL/PB MUHAMMAD ZAMRI BIN ABU BAKAR",j:"UNIT PATROL",s:"Bravo"},
+  {id:"M326",n:"KONST/PB MOHD SHARIL BIN NASIR",j:"WAKTU PEJABAT /PENTADBIRAN",s:"Bravo"},
+  {id:"M327",n:"PEL.PB MOHD IRWANZAZMI BIN ABD AZIS",j:"BANGUNAN UTAMA",s:"Bravo"},
+  {id:"M328",n:"KONST/PB MUHAMMAD HAFIZZAL BIN MAT YUSOFF",j:"UNIT PATROL",s:"Bravo"},
+  {id:"M329",n:"KONST/PB MOHAMAD HEZRIE BIN ALIAS",j:"UNIT PATROL",s:"Bravo"},
+  {id:"M330",n:"KONST/PB JAMAL ABDUL NASIR BIN MANSHOR",j:"UNIT PATROL",s:"Bravo"},
+  {id:"M331",n:"KONST/PB BAZILAH BINTI A.RAHAMAN",j:"KOMPENI ECHO",s:"Bravo"},
+  {id:"M332",n:"KPL/PB KHIRUL ANUAR BIN ABDUL MUAZ",j:"JABATAN URO/NEFRO",s:"Bravo"},
+  {id:"M333",n:"KONST/PB AIDIL ISWAN BIN AJIS",j:"UNIT PATROL",s:"Bravo"},
+  {id:"M334",n:"KONST/PB NURUL MAZIDAH BINTI ZULKIFLI",j:"KOMPENI ECHO",s:"Bravo"},
+  {id:"M335",n:"KONST/PB ADIE PUTRA BIN GHAZALI",j:"JABATAN URO/NEFRO",s:"Bravo"},
+  {id:"M336",n:"PEL.PB MUHAMAD IZHAM BIN JAMAL",j:"KOMPENI ECHO",s:"Bravo"},
+  {id:"M337",n:"KONST/PB MOHD SHAH FARIZ BIN ZAINAL ABIDIN",j:"JABATAN URO/NEFRO",s:"Bravo"},
+  {id:"M338",n:"PEL.PB MUHAMMAD NIZAM BIN AHMAD",j:"JABATAN URO/NEFRO",s:"Bravo"},
+  {id:"M339",n:"KPL/PB HAZLAN BIN MOHD RESDI",j:"BANGUNAN MHKL",s:"Bravo"},
+  {id:"M340",n:"PEL.PB WAN ISHAK BIN MAZLAN",j:"JABATAN URO/NEFRO",s:"Bravo"},
+  {id:"M341",n:"KONST/PB ANASHATOL ARNAEDA BINTI JAFRI",j:"BANGUNAN MHKL",s:"Bravo"},
+  {id:"M342",n:"PEL.PB WAN FATIMAH AZ-ZAHARAH BINTI WAN MOHAMED",j:"JABATAN URO/NEFRO",s:"Bravo"},
+  {id:"M343",n:"PEL.PB MOHAMMAD ALIF BIN NASARUDDIN",j:"BANGUNAN MHKL",s:"Bravo"},
+  {id:"M344",n:"KPL/PB VIKNESWARAN A/L MONOHARAN",j:"JABATAN URO/NEFRO B",s:"Bravo"},
+  {id:"M345",n:"KPL/PB MOHD KHADAFEE BIN MD SAAD",j:"JABATAN RADIOTERAPI (RT)",s:"Bravo"},
+  {id:"M346",n:"LKPL/PB ZULKIFLI BIN YUSOF",j:"JABATAN URO/NEFRO B",s:"Bravo"},
+  {id:"M347",n:"LKPL/PB NOR AZURA BINTI MAMAT @ MUHAMAD",j:"JABATAN RADIOTERAPI (RT)",s:"Bravo"},
+  {id:"M348",n:"KONST/PB MOHAMAD YATIM BIN YAHAYA",j:"JABATAN URO/NEFRO B",s:"Bravo"},
+  {id:"M349",n:"KOSNT/PB MOHD SHAFIK BIN IBRAM",j:"JABATAN RADIOTERAPI (RT)",s:"Bravo"},
+  {id:"M350",n:"PEL.PB NABILA BINTI ABDUL RAHMAN",j:"JABATAN URO/NEFRO B",s:"Bravo"},
+  {id:"M351",n:"KONST/PB ZULHILMI BIN ZAINUDIN",j:"JABATAN RADIOTERAPI (RT)",s:"Bravo"},
+  {id:"M352",n:"PEL.PB MUHAMAD NOR BIN SAMSUDIN",j:"JABATAN URO/NEFRO B",s:"Bravo"},
+  {id:"M353",n:"LKPL/PB NABILAH BINTI  MOHD FADZIL",j:"GERAKAN, AMRA & CCTV",s:"Bravo"},
+  {id:"M354",n:"KONST/PB ZILAIDAH BINTI MUSTAFA",j:"GERAKAN, AMRA & CCTV",s:"Bravo"},
+  {id:"M355",n:"KPL/PB KAMARUZAMAN BIN ABDUL SAMAD",j:"UNIT TUGAS KHAS",s:"Bravo"},
+  {id:"M356",n:"KONST/PB MOHD SUHAIMEE BIN MOHD NONG",j:"GERAKAN, AMRA & CCTV",s:"Bravo"},
+  {id:"M357",n:"LKPL/PB MUHAMMAD HAZIQ BIN HAZMI",j:"UNIT TUGAS KHAS",s:"Bravo"},
+  {id:"M358",n:"LKPL/PB KHAIRUSY SYAKIRIN BIN MOHD SAMSUDIN",j:"GERAKAN, AMRA & CCTV",s:"Bravo"},
+  {id:"M359",n:"KONST/PB MOHD FAIRUZ BIN MUSTAZA",j:"UNIT TUGAS KHAS",s:"Bravo"},
+  {id:"M360",n:"KONST/PB MUHAMMAD ASHRAFF BIN ZULKIFLI",j:"UNIT TUGAS KHAS",s:"Bravo"},
+  {id:"M361",n:"KPL/PB PUTRA NOR FIRDAUS BIN ALIAS",j:"JABATAN PEDIATRIK",s:"Bravo"},
+  {id:"M362",n:"LKPL/PB MOHD FAZLI BIN MAT NOR",j:"JABATAN PEDIATRIK",s:"Bravo"},
+  {id:"M363",n:"LKPL/PB NOORSYIDA BINTI HAMDAN",j:"JABATAN PEDIATRIK",s:"Bravo"},
+  {id:"M364",n:"LKPL/PB MASRI BIN IDRIS",j:"JABATAN PEDIATRIK",s:"Bravo"},
+  {id:"M365",n:"KONST/PB MOHAMMAD FAZREEZUAN BIN ABU MOHAMED",j:"JABATAN PEDIATRIK",s:"Bravo"},
+  {id:"M366",n:"KONST/PB NUR AYUNI BINTI MOHD FAUZI",j:"JABATAN PEDIATRIK",s:"Bravo"},
+  {id:"M367",n:"PEL.PB MOHAMAD DZULFIKRI BIN JAAFAR",j:"JABATAN PEDIATRIK",s:"Bravo"},
+  {id:"M368",n:"PEL.PB SITI AISHAH BINTI RAZAK",j:"JABATAN PEDIATRIK",s:"Bravo"},
 ];
 
 // ═══ SUPABASE API ══════════════════════════════════════
@@ -597,13 +973,49 @@ function renderList(){
     el.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;font-size:12px;">Tiada anggota bertugas hari ini.</div>';
     return;
   }
-  const jc={IKTAR:"#60a5fa",MHKL:"#34d399",RT:"#fbbf24","Wisma Rekod":"#f472b6"},ac={Alpha:"av-a",Bravo:"av-b",Charlie:"av-c",Delta:"av-d"};
+  const jc={
+    "JABATAN IKTAR":"#60a5fa",
+    "BANGUNAN MHKL":"#34d399",
+    "JABATAN RADIOTERAPI (RT)":"#fbbf24",
+    "BANGUNAN WISMA REKOD":"#f472b6",
+    "BANGUNAN UTAMA":"#a78bfa",
+    "JABATAN KECEMASAN":"#fb7185",
+    "UNIT PATROL":"#38bdf8",
+    "JABATAN PEDIATRIK":"#86efac",
+    "JABATAN URO/NEFRO":"#fdba74",
+    "JABATAN URO/NEFRO B":"#fca5a5",
+    "BANGUNAN SCACC":"#67e8f9",
+    "SCACC WAKTU PEJABAT":"#5eead4",
+    "IUN WAKTU PEJABAT":"#c4b5fd",
+    "GERAKAN, AMRA & CCTV":"#d9f99d",
+    "UNIT TUGAS KHAS":"#fde68a",
+    "WAKTU PEJABAT /PENTADBIRAN":"#94a3b8",
+    "KOMPENI ECHO":"#e879f9",
+  },ac={Alpha:"av-a",Bravo:"av-b",Charlie:"av-c",Delta:"av-d"};
   const groups={};vis.forEach(m=>{const k=m.s+"|"+m.j;if(!groups[k])groups[k]={s:m.s,j:m.j,ms:[]};groups[k].ms.push(m);});
   Object.values(groups).forEach(g=>{
     const st=getShift(g.s,d);
     if(st==="OFF") return; // Skip kumpulan OFF
     const hdr=document.createElement("div");hdr.className="grp";hdr.style.color=jc[g.j]||"#e2e8f0";
-    const jabFull={IKTAR:"Jabatan IKTAR",MHKL:"Jabatan MHKL",RT:"Jabatan RT","Wisma Rekod":"Wisma Rekod"};
+    const jabFull={
+    "JABATAN IKTAR":"Jab. IKTAR",
+    "BANGUNAN MHKL":"Bgn. MHKL",
+    "JABATAN RADIOTERAPI (RT)":"Jab. RT",
+    "BANGUNAN WISMA REKOD":"Wisma Rekod",
+    "BANGUNAN UTAMA":"Bgn. Utama",
+    "JABATAN KECEMASAN":"Jab. Kecemasan",
+    "UNIT PATROL":"Unit Patrol",
+    "JABATAN PEDIATRIK":"Jab. Pediatrik",
+    "JABATAN URO/NEFRO":"Jab. Uro/Nefro",
+    "JABATAN URO/NEFRO B":"Jab. Uro/Nefro B",
+    "BANGUNAN SCACC":"Bgn. SCACC",
+    "SCACC WAKTU PEJABAT":"SCACC Wkt Pej",
+    "IUN WAKTU PEJABAT":"IUN Wkt Pej",
+    "GERAKAN, AMRA & CCTV":"Gerakan/AMRA",
+    "UNIT TUGAS KHAS":"UTK",
+    "WAKTU PEJABAT /PENTADBIRAN":"Pentadbiran",
+    "KOMPENI ECHO":"Kompeni Echo",
+  };
     hdr.innerHTML="Shift "+g.s+" · "+(jabFull[g.j]||g.j)+` <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:${jc[g.j]}22;">${st}</span>`;
     el.appendChild(hdr);
     g.ms.forEach(m=>{
@@ -705,7 +1117,7 @@ function snapPhoto(){
   ctx.font="bold "+fz+"px monospace";ctx.fillStyle="#00ff88";ctx.fillText("⏱ "+fmtDT(photoTs),12,H-bH+fz+5);
   ctx.font=fz+"px monospace";ctx.fillStyle="#60a5fa";ctx.fillText("👤 "+(curM?curM.n:""),12,H-bH+fz*2+9);
   ctx.fillStyle=isLate?"#fbbf24":"#a3e635";ctx.fillText("Shift "+(curM?curM.s:"")+"("+curST+") Slot "+(curSlot+1)+"/8 "+z(SLOTS[curST][curSlot])+":00"+(isLate?" LEWAT "+Math.floor(msLate/60000)+"min":""),12,H-bH+fz*3+13);
-  ctx.fillStyle="#94a3b8";ctx.font=(fz-1)+"px monospace";ctx.fillText("📍 Hospital Kuala Lumpur (IKTAR/RT/MHKL)",12,H-bH+fz*4+17);
+  ctx.fillStyle="#94a3b8";ctx.font=(fz-1)+"px monospace";ctx.fillText("📍 Cawangan Keselamatan HKL",12,H-bH+fz*4+17);
   try{
     photo=cv.toDataURL("image/jpeg",0.80);
   }catch(e){
@@ -998,19 +1410,21 @@ function fmtDur(ms){
 }
 
 async function openRehat(){
-  if(!adminOk){ pinTarget="rehat"; pinBuf=""; updDots(); show("p-pin"); return; }
-  await _openRehat();
+  await _openRehat(); // Anggota terus guna - tiada PIN
 }
 async function _openRehat(){
   await loadRehatToday();
+  await loadRehatToday();
   const sel=document.getElementById("rh-mem");
-  sel.innerHTML='<option value="">— Pilih nama —</option>';
-  MEMBERS.forEach(m=>{
+  sel.innerHTML='<option value="">— Pilih nama anda —</option>';
+  // Tunjuk anggota bertugas shift semasa sahaja
+  const d=myt(), st2=stNow();
+  MEMBERS.filter(m=>getShift(m.s,d)===st2).forEach(m=>{
     const o=document.createElement("option");
     o.value=m.id;
-    const st=getMemberRehatStatus(m.id);
-    const tag=st.status==="diluar"?" 🚪 DILUAR":(st.status==="dalam"&&st.over)?" ⚠ MELEBIHI":"";
-    o.textContent=m.n+" ("+m.s+" · "+m.j+")"+tag;
+    const rs=getMemberRehatStatus(m.id);
+    const tag=rs.status==="diluar"?" 🚪 (Diluar)":rs.status==="dalam"&&rs.pairs?.length?" ✅ (Dah Masuk)":"";
+    o.textContent=m.n+tag;
     sel.appendChild(o);
   });
   rhAction="keluar"; rhMember=null; rhPhoto=null; rhPhotoTs=null; rhLoc=null;
@@ -1141,24 +1555,19 @@ async function submitMasukSemula(){
   renderList();
 
   if(over){
-    toast("⚠ Masuk semula direkod. Masa rehat melebihi 4 jam — wajib isi Cuti Rehat!");
-    // Auto-open leave form
+    // Show warning - anggota kena isi cuti rehat
+    show("p-select");
     setTimeout(()=>{
+      // Auto open leave form for cuti rehat
       _openLeave();
-      // Pre-select member
       const sel=document.getElementById("lvm");
       for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===mid){sel.selectedIndex=i;break;}}
       setLT("Cuti");
       document.getElementById("lvnota").value="Cuti Rehat — Melebihi 4 jam ("+fmtDur(durMs)+")";
-      // Show warning
-      const warn=document.createElement("div");
-      warn.style.cssText="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:11px 13px;display:flex;gap:10px;margin-bottom:10px;";
-      warn.innerHTML='<span>⚠️</span><div><div style="font-size:12px;font-weight:700;color:#f87171;">Masa Rehat Melebihi 4 Jam!</div><div style="font-size:10px;color:#f87171;opacity:.8;">Masa rehat: '+fmtDur(durMs)+' — Wajib isi dan hantar borang Cuti Rehat.</div></div>';
-      const scroll=document.querySelector("#p-leave .scroll");
-      if(scroll) scroll.prepend(warn);
-    },500);
+      toast("⚠ Sila isi dan hantar borang Cuti Rehat — melebihi 4 jam!");
+    },300);
   } else {
-    toast("✅ Masuk semula "+rhMember.n+" direkod — "+fmtDur(durMs));
+    toast("✅ Masuk semula direkod ("+fmtDur(durMs)+"). Sila teruskan check-in seperti biasa.");
     goSel();
   }
 }
