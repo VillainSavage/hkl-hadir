@@ -1071,8 +1071,11 @@ async function startCam(){
     return;
   }
   const tries=[
+    {video:{facingMode:{exact:camFace},width:{ideal:1920},height:{ideal:1920}},audio:false},
+    {video:{facingMode:camFace,width:{ideal:1920},height:{ideal:1920}},audio:false},
     {video:{facingMode:{exact:camFace}},audio:false},
     {video:{facingMode:camFace},audio:false},
+    {video:{facingMode:"user",width:{ideal:1280},height:{ideal:1280}},audio:false},
     {video:{facingMode:"user"},audio:false},
     {video:true,audio:false}
   ];
@@ -1117,9 +1120,18 @@ function snapPhoto(){
   const vid=document.getElementById("vid"),cv=document.getElementById("cv");
   if(!vid||!vid.videoWidth||vid.videoWidth===0){toast("⚠ Kamera belum sedia.");return;}
   photoTs=Date.now();
-  const W=vid.videoWidth,H=vid.videoHeight;
+  const vw=vid.videoWidth,vh=vid.videoHeight;
+  // Hadkan resolusi maksimum 1600px supaya gambar jernih tapi saiz fail wajar
+  const MAXD=1600;
+  let W=vw,H=vh;
+  if(Math.max(vw,vh)>MAXD){
+    const scale=MAXD/Math.max(vw,vh);
+    W=Math.round(vw*scale);H=Math.round(vh*scale);
+  }
   cv.width=W;cv.height=H;
   const ctx=cv.getContext("2d");
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality="high";
   ctx.drawImage(vid,0,0,W,H);
   const ts=slotTs(curST)[curSlot],msLate=ts?photoTs-ts:0,isLate=msLate>60000;
   const bH=Math.max(70,Math.round(H*0.10)),fz=Math.max(13,Math.round(W*0.020));
@@ -1129,7 +1141,7 @@ function snapPhoto(){
   ctx.fillStyle=isLate?"#fbbf24":"#a3e635";ctx.fillText("Shift "+(curM?curM.s:"")+"("+curST+") Slot "+(curSlot+1)+"/8 "+z(SLOTS[curST][curSlot])+":00"+(isLate?" LEWAT "+Math.floor(msLate/60000)+"min":""),12,H-bH+fz*3+13);
   ctx.fillStyle="#94a3b8";ctx.font=(fz-1)+"px monospace";ctx.fillText("📍 Cawangan Keselamatan HKL",12,H-bH+fz*4+17);
   try{
-    photo=cv.toDataURL("image/jpeg",0.80);
+    photo=cv.toDataURL("image/jpeg",0.92);
   }catch(e){
     // Canvas tainted on file:// — photo tanpa watermark
     console.warn("Canvas toDataURL failed:",e.message);
