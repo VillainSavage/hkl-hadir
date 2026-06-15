@@ -958,7 +958,6 @@ function tick(){
   const shiftNow=stNow();
   ["Alpha","Bravo","Charlie","Delta"].forEach(s=>{
     const st=getEffectiveShift(s,d);
-    if(st==="OFF") return; // Jangan tunjuk shift OFF
     const aktif=st===shiftNow;
     const c=st==="PG"?"#0e7490":st==="PT"?"#b45309":st==="M"?"#7c3aed":"#4b5563";
     sb.innerHTML+=`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${aktif?c:c+"33"};color:${aktif?"#fff":c};border:1px solid ${c}55;${aktif?"box-shadow:0 0 6px "+c+"66;":""}">${s}:${st}${aktif?" ◀":""}</span>`;
@@ -978,13 +977,7 @@ function renderList(){
   let vis=MEMBERS;
   if(q)vis=vis.filter(m=>m.n.toLowerCase().includes(q)||m.j.toLowerCase().includes(q));
 
-  // Hanya tunjuk anggota yang bertugas shift SEKARANG sahaja
-  // Contoh: jam 15:00-22:59 = PT sahaja yang muncul
-  const shiftSekarang = stNow(); // PG / PT / M
-  if(!q) vis=vis.filter(m=>{
-    const st=getEffectiveShift(m.s,d);
-    return st===shiftSekarang;
-  });
+  // Papar semua anggota — semua kompeni & shift (termasuk yang OFF)
 
   const el=document.getElementById("mlist");el.innerHTML="";
   if(!vis.length){
@@ -1013,7 +1006,6 @@ function renderList(){
   const groups={};vis.forEach(m=>{const k=m.s+"|"+m.j;if(!groups[k])groups[k]={s:m.s,j:m.j,ms:[]};groups[k].ms.push(m);});
   Object.values(groups).forEach(g=>{
     const st=getEffectiveShift(g.s,d);
-    if(st==="OFF") return; // Skip kumpulan OFF
     const hdr=document.createElement("div");hdr.className="grp";hdr.style.color=jc[g.j]||"#e2e8f0";
     const jabFull={
     "JABATAN IKTAR":"Jab. IKTAR",
@@ -1039,7 +1031,7 @@ function renderList(){
     g.ms.forEach(m=>{
       const mr=getCacheRecs(m.id),lv=getCacheLv(m.id),done=mr.length;
       let bc="b-no",bt="Mulakan";
-      if(lv){bc="b-mc";bt=lv.type;}else if(done>=8){bc="b-ok";bt=done+"/8 ✓";}else if(done>0){bc="b-pt";bt=done+"/8";}
+      if(st==="OFF"){bc="b-off";bt="OFF";}else if(lv){bc="b-mc";bt=lv.type;}else if(done>=8){bc="b-ok";bt=done+"/8 ✓";}else if(done>0){bc="b-pt";bt=done+"/8";}
       const ini=m.n.trim().split(" ").filter(Boolean),av=(ini[0][0]+(ini[ini.length-1][0])).toUpperCase();
       const btn=document.createElement("button");btn.className="row";
       const jf={IKTAR:"IKTAR",MHKL:"MHKL",RT:"RT","Wisma Rekod":"Wisma Rekod"};
