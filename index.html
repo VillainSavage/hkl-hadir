@@ -106,6 +106,7 @@ textarea{resize:none;}
       <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openLaporan()">📊 &nbsp;Laporan Bulanan</button>
       <button class="btn btn-ghost" style="font-size:12px;padding:11px;" onclick="openLaporanLv()">📋 &nbsp;Laporan MC/EL/Cuti</button>
     </div>
+    <div style="text-align:center;font-size:9px;color:#475569;padding:8px 0 2px;">Sistem Cawangan Keselamatan HKL · © 2026 SJN ADILAH</div>
     <div style="height:6px;"></div>
   </div>
 </div>
@@ -292,7 +293,7 @@ textarea{resize:none;}
 <div id="p-laporan" class="page">
   <div class="top">
     <button class="top-back" onclick="goSel()">‹</button>
-    <div style="flex:1;"><div class="top-title">Laporan Bulanan Kehadiran</div><div class="top-sub">Hanya Penyelia</div></div>
+    <div style="flex:1;"><div class="top-title">Laporan Bulanan Kehadiran</div><div class="top-sub" id="lap-who">Hanya Penyelia</div></div>
     <button onclick="adminOut()" style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;">🔒 Keluar</button>
   </div>
   <div class="scroll">
@@ -318,7 +319,7 @@ textarea{resize:none;}
 <div id="p-laporan-lv" class="page">
   <div class="top">
     <button class="top-back" onclick="goSel()">‹</button>
-    <div style="flex:1;"><div class="top-title">Laporan MC / EL / Cuti</div><div class="top-sub">Hanya Penyelia · Semakan & Kelulusan</div></div>
+    <div style="flex:1;"><div class="top-title">Laporan MC / EL / Cuti</div><div class="top-sub" id="llv-who">Hanya Penyelia · Semakan & Kelulusan</div></div>
     <button onclick="adminOut()" style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;">🔒 Keluar</button>
   </div>
   <div class="scroll">
@@ -373,7 +374,7 @@ textarea{resize:none;}
 <div id="p-admin" class="page">
   <div class="top">
     <button class="top-back" onclick="goSel()">‹</button>
-    <div style="flex:1;"><div class="top-title">Rekod Kehadiran</div><div class="top-sub">Hospital Kuala Lumpur · Penyelia</div></div>
+    <div style="flex:1;"><div class="top-title">Rekod Kehadiran</div><div class="top-sub" id="adm-who">Hospital Kuala Lumpur · Penyelia</div></div>
     <button onclick="adminOut()" style="background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:7px;color:#f87171;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:inherit;">🔒 Keluar</button>
   </div>
   <div class="scroll">
@@ -429,7 +430,10 @@ const SUPABASE_URL = "https://npotmmcomqhnldgmbyso.supabase.co";
 const SUPABASE_KEY = "sb_publishable_MA-BFIOAYKsBBUhfvub7gQ_A647ggGW";
 // ═══════════════════════════════════════════════════════
 
-const PIN    = "6438670";
+const PINS = {
+  "6438670": "Penyelia",
+  "6442464": "SJN NAZMI"
+};
 const HKL    = {lat:3.1718,lng:101.6989};
 const RADIUS = 1200; // Meliputi seluruh kawasan HKL + Wisma Polis Bantuan
 const GRACE  = 3600000;
@@ -480,7 +484,6 @@ const SCHED={
     Dis:["PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT","PT","PG","PG","M","M","OFF","OFF","PT"],
   },
 };
-// Peta bulan ke kunci jadual (month index 0-based)
 const MPAT={3:"Apr",4:"Mei",5:"Jun",6:"Jul",7:"Ogos",8:"Sep",9:"Okt",10:"Nov",11:"Dis"};
 const MEMBERS=[
   {id:"M001",n:"KPL/PB MOHAMMAD ALLIF BIN MOHTAR",j:"JABATAN IKTAR",s:"Alpha"},
@@ -891,7 +894,7 @@ function getCacheLv(mid){return cache.lvs.find(r=>r.mid===mid);}
 let curM=null,curSlot=0,curST="PT";
 let photo=null,photoTs=null,userLoc=null;
 let stream=null,camFace="user",tsTimer=null;
-let adminOk=false,pinBuf="",pinTarget="admin";
+let adminOk=false,pinBuf="",pinTarget="admin",adminName="";
 let lvType="MC",lvFile=null;
 
 // ═══ TIME (MYT UTC+8) ═════════════════════════════════
@@ -911,6 +914,21 @@ function getShift(shiftName,date){
   const val=arr[date.getDate()-1];
   return val||"OFF";
 }
+
+// Shift "berkesan" — kira sambungan shift Malam (M) ke hari OFF pertama.
+// Anggota shift M (malam kedua) masih bertugas dari 23:00 hingga ~07:00 esoknya.
+// Jika hari ini OFF tapi SEMALAM adalah M, dan masa sekarang masih sebelum 09:00,
+// anggota dikira masih dalam shift M (boleh check-in, nama tidak hilang).
+// Selepas 09:00, hari OFF berkuat kuasa sepenuhnya.
+function getEffectiveShift(shiftName,date){
+  const today=getShift(shiftName,date);
+  if(today==="OFF" && date.getHours()<9){
+    const yesterday=new Date(date.getTime()-24*3600000);
+    if(getShift(shiftName,yesterday)==="M") return "M";
+  }
+  return today;
+}
+
 function stNow(){const h=myt().getHours();return h>=7&&h<15?"PG":h>=15&&h<23?"PT":"M";}
 function slotTs(st){const d=myt(),Y=d.getFullYear(),Mo=d.getMonth(),D=d.getDate(),H=d.getHours();return SLOTS[st].map(h=>{let day=D;if(st==="M"&&h<12&&H>=12)day=D+1;return Date.UTC(Y,Mo,day,h,0,0,0)-(8*3600000);});}
 function bestSlot(mid,st){
@@ -939,7 +957,7 @@ function tick(){
   const sb=document.getElementById("shifts");sb.innerHTML="";
   const shiftNow=stNow();
   ["Alpha","Bravo","Charlie","Delta"].forEach(s=>{
-    const st=getShift(s,d);
+    const st=getEffectiveShift(s,d);
     if(st==="OFF") return; // Jangan tunjuk shift OFF
     const aktif=st===shiftNow;
     const c=st==="PG"?"#0e7490":st==="PT"?"#b45309":st==="M"?"#7c3aed":"#4b5563";
@@ -964,7 +982,7 @@ function renderList(){
   // Contoh: jam 15:00-22:59 = PT sahaja yang muncul
   const shiftSekarang = stNow(); // PG / PT / M
   if(!q) vis=vis.filter(m=>{
-    const st=getShift(m.s,d);
+    const st=getEffectiveShift(m.s,d);
     return st===shiftSekarang;
   });
 
@@ -994,7 +1012,7 @@ function renderList(){
   },ac={Alpha:"av-a",Bravo:"av-b",Charlie:"av-c",Delta:"av-d"};
   const groups={};vis.forEach(m=>{const k=m.s+"|"+m.j;if(!groups[k])groups[k]={s:m.s,j:m.j,ms:[]};groups[k].ms.push(m);});
   Object.values(groups).forEach(g=>{
-    const st=getShift(g.s,d);
+    const st=getEffectiveShift(g.s,d);
     if(st==="OFF") return; // Skip kumpulan OFF
     const hdr=document.createElement("div");hdr.className="grp";hdr.style.color=jc[g.j]||"#e2e8f0";
     const jabFull={
@@ -1035,7 +1053,7 @@ function renderList(){
 function startCI(m){
   const lv=getCacheLv(m.id);if(lv){toast("⚠ "+m.n+" telah melapor "+lv.type);return;}
   if(getCacheRecs(m.id).length>=8){toast("✅ Semua 8 check-in selesai!");return;}
-  let st=getShift(m.s,myt());if(st==="OFF")st=stNow();
+  let st=getEffectiveShift(m.s,myt());if(st==="OFF")st=stNow();
   const slot=bestSlot(m.id,st);
   curM=m;curSlot=slot<0?0:slot;curST=st;photo=null;photoTs=null;userLoc=null;
   document.getElementById("cn").textContent=m.n;
@@ -1316,15 +1334,27 @@ async function submitLeave(){
 
 // ═══ PIN ══════════════════════════════════════════════
 function openAdmin(){if(!adminOk){pinTarget="admin";pinBuf="";updDots();show("p-pin");return;}_openAdmin();}
-function adminOut(){adminOk=false;goSel();toast("🔒 Log keluar.");}
-function pk(v){if(v==="DEL"){pinBuf=pinBuf.slice(0,-1);}else if(v==="OK"){chkPin();return;}else if(pinBuf.length<10)pinBuf+=v;updDots();if(pinBuf.length===PIN.length)setTimeout(chkPin,120);}
+function adminOut(){adminOk=false;adminName="";goSel();toast("🔒 Log keluar.");}
+function pk(v){if(v==="DEL"){pinBuf=pinBuf.slice(0,-1);}else if(v==="OK"){chkPin();return;}else if(pinBuf.length<10)pinBuf+=v;updDots();
+  const pinLens=Object.keys(PINS).map(p=>p.length);
+  if(pinLens.includes(pinBuf.length))setTimeout(chkPin,120);
+}
 function updDots(){const el=document.getElementById("pindots");el.innerHTML="";for(let i=0;i<pinBuf.length;i++){const d=document.createElement("div");d.style.cssText="width:11px;height:11px;border-radius:50%;background:#3b82f6;";el.appendChild(d);}}
-function chkPin(){if(pinBuf===PIN){adminOk=true;pinBuf="";document.getElementById("pinerr").style.display="none";
-  if(pinTarget==="leave")_openLeave();
-  else if(pinTarget==="rehat")_openRehat();
-  else if(pinTarget==="laporan"){renderLaporan();show("p-laporan");}
-  else if(pinTarget==="laporanlv"){renderLaporanLv();show("p-laporan-lv");}
-  else _openAdmin();}else{pinBuf="";updDots();document.getElementById("pinerr").style.display="block";const b=document.getElementById("pinbox");b.style.animation="none";b.offsetHeight;b.style.animation="shake .4s ease";}}
+function chkPin(){
+  if(PINS[pinBuf]){
+    adminOk=true; adminName=PINS[pinBuf]; pinBuf="";
+    document.getElementById("pinerr").style.display="none";
+    const wel="Log masuk: "+adminName;
+    const el1=document.getElementById("lap-who"), el2=document.getElementById("llv-who"), el3=document.getElementById("adm-who");
+    if(el1) el1.textContent=wel;
+    if(el2) el2.textContent=wel;
+    if(el3) el3.textContent=wel;
+    if(pinTarget==="leave")_openLeave();
+    else if(pinTarget==="rehat")_openRehat();
+    else if(pinTarget==="laporan"){renderLaporan();show("p-laporan");}
+    else if(pinTarget==="laporanlv"){renderLaporanLv();show("p-laporan-lv");}
+    else _openAdmin();
+  }else{pinBuf="";updDots();document.getElementById("pinerr").style.display="block";const b=document.getElementById("pinbox");b.style.animation="none";b.offsetHeight;b.style.animation="shake .4s ease";}}
 
 // ═══ ADMIN ════════════════════════════════════════════
 async function _openAdmin(){
@@ -1414,12 +1444,11 @@ async function openRehat(){
 }
 async function _openRehat(){
   await loadRehatToday();
-  await loadRehatToday();
   const sel=document.getElementById("rh-mem");
   sel.innerHTML='<option value="">— Pilih nama anda —</option>';
-  // Tunjuk anggota bertugas shift semasa sahaja
+  // Tunjuk anggota bertugas shift semasa sahaja (termasuk sambungan malam kedua)
   const d=myt(), st2=stNow();
-  MEMBERS.filter(m=>getShift(m.s,d)===st2).forEach(m=>{
+  MEMBERS.filter(m=>getEffectiveShift(m.s,d)===st2).forEach(m=>{
     const o=document.createElement("option");
     o.value=m.id;
     const rs=getMemberRehatStatus(m.id);
@@ -1745,7 +1774,7 @@ async function renderLaporanLv(){
           <div style="font-size:10px;color:#64748b;margin-top:1px;">${r.jab} · Shift ${r.shift} · ${r.date}</div>
           <div style="font-size:10px;color:#94a3b8;margin-top:3px;font-style:italic;">${r.nota||"-"}</div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-            <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:${sc}22;color:${sc};border:1px solid ${sc}44;">${status}</span>
+            <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:${sc}22;color:${sc};border:1px solid ${sc}44;">${status}${r.approved_by?" · "+r.approved_by:""}</span>
             <span style="font-size:9px;color:#64748b;">${fmtT(r.ts)}</span>
           </div>
           ${status==="Menunggu"?`
@@ -1766,7 +1795,7 @@ async function approveLeave(id, approve){
   // Update in Supabase using PATCH
   const url=SUPABASE_URL+"/rest/v1/leaves?id=eq."+id;
   const headers={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"};
-  await fetch(url,{method:"PATCH",headers,body:JSON.stringify({status,approved_by:"Penyelia"})});
+  await fetch(url,{method:"PATCH",headers,body:JSON.stringify({status,approved_by:adminName||"Penyelia"})});
   hideLoad();
   toast(approve?"✅ Diluluskan":"❌ Ditolak");
   renderLaporanLv();
